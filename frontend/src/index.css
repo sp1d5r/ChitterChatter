@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+dark:body {
+  background-color: rgb(27, 9, 0);
+}
+
+dark:root {
+  background-color: rgb(27, 9, 0);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #fffaf2;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+@layer base {
+  :root {
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+
+
+@layer base {
+  :root {
+    --background: 60 30% 98%;
+    --foreground: 288 15% 25%;
+    
+    --card: 60 30% 98%;
+    --card-foreground: 288 15% 25%;
+    
+    --popover: 60 30% 98%;
+    --popover-foreground: 288 15% 25%;
+    
+    --primary: 288 70% 90%;
+    --primary-foreground: 288 30% 25%;
+    
+    --secondary: 152 70% 90%;
+    --secondary-foreground: 152 30% 25%;
+    
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 25% 40%;
+    
+    --accent: 20 70% 90%;
+    --accent-foreground: 20 30% 25%;
+    
+    --destructive: 350 70% 90%;
+    --destructive-foreground: 350 30% 25%;
+
+    --border: 288 20% 90%;
+    --input: 288 20% 90%;
+    --ring: 288 70% 90%;
+    
+    --radius: 1rem;
+  }
+}
