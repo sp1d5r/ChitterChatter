@@ -63,9 +63,6 @@ export const BackgroundPhoneAnimation = ({
         "h-96 md:h-[40rem] relative flex items-center w-full justify-center overflow-hidden",
         className
       )}
-      style={{
-        backgroundColor: '#fffaf2',
-      }}
     >
       {/* iPhone - updated positioning */}
       <motion.div 
@@ -83,7 +80,7 @@ export const BackgroundPhoneAnimation = ({
         }}
       >
         {/* iPhone frame with more accurate dimensions and notch */}
-        <div className="relative w-[290px] h-[580px] bg-black rounded-[50px] border-4 border-gray-800 shadow-xl">
+        <div className="hidden md:flex relative w-[290px] h-[580px] bg-black rounded-[50px] border-4 border-gray-800 shadow-xl">
           {/* Notch */}
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120px] h-7 bg-black rounded-b-3xl z-20" />
           

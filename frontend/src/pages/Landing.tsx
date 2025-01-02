@@ -168,7 +168,7 @@ export const Landing: React.FC = () => {
         </div>
 
         <div className="relative flex items-center justify-center my-50 min-h-[20vh]">
-          <div className="absolute w-[100vw] min-h-[20vh] bg-primary flex flex-col justify-center items-center">
+          <div className="absolute w-[100vw] min-h-[20vh] bg-primary dark:bg-[#111111] flex flex-col justify-center items-center">
               <h1 className="relative text-4xl font-bold m-0">
                   <div className="absolute left-0 top-[1px] bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-2 from-purple-500 via-violet-500 to-pink-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">
                       <span className="">Join today</span>
@@ -177,7 +177,7 @@ export const Landing: React.FC = () => {
                       <span className="">Join today</span>
                   </div>
               </h1>
-              <p className="text-black mb-1">Try today for free</p>
+              <p className="text-black mb-1 dark:text-white">Try today for free</p>
               <Button variant="secondary">Sign up</Button>
           </div>
         </div>

@@ -22,7 +22,7 @@ const NotFound = () => <ScrollableLayout><h2>No Clue Mate...</h2></ScrollableLay
 
 function App() {
   return (
-    <div className='dark:bg-gray-900'>
+    <div>
       <Router>
         <DarkModeProvider>
           <AuthProvider>

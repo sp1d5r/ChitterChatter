@@ -20,16 +20,19 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 bg-accent dark:bg-gray-700 shadow-sm dark:shadow-gray-800 z-50">
+    <nav className="sticky top-0 bg-accent dark:bg-background shadow-sm dark:shadow-gray-800 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
-          <Link to="/" className="text-2xl font-bold text-black">ChitterChatter</Link>
+          <Link to="/" className="text-2xl font-bold text-black dark:text-white">ChitterChatter</Link>
         </div>
 
         {
           authState.status === AuthStatus.UNAUTHENTICATED && <div className="hidden md:flex space-x-2">
             <Button variant="outline" asChild><Link to="/authentication?mode=login" className="dark:text-gray-200 dark:hover:text-white">Log in</Link></Button>
-            <Button asChild><Link to="/authentication?mode=sign-up" className="dark:text-gray-200">Sign up</Link></Button>
+            <Button asChild><Link to="/authentication?mode=sign-up" className="">Sign up</Link></Button>
+            <Button variant="outline" size="icon" onClick={toggleDarkMode} className="dark:border-gray-600 dark:text-gray-200 dark:hover:text-white dark:hover:border-gray-400">
+              {darkModeState ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
           </div>
         }
         {
