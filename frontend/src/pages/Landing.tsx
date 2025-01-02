@@ -177,7 +177,7 @@ export const Landing: React.FC = () => {
                       <span className="">Join today</span>
                   </div>
               </h1>
-              <p className="text-white mb-1">Try today for free</p>
+              <p className="text-black mb-1">Try today for free</p>
               <Button variant="secondary">Sign up</Button>
           </div>
         </div>

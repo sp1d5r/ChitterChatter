@@ -20,7 +20,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 bg-primary dark:bg-gray-700 shadow-sm dark:shadow-gray-800 z-50">
+    <nav className="sticky top-0 bg-accent dark:bg-gray-700 shadow-sm dark:shadow-gray-800 z-50">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
           <Link to="/" className="text-2xl font-bold text-black">ChitterChatter</Link>
