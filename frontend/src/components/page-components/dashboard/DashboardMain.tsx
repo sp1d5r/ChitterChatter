@@ -13,11 +13,14 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         <h1 className='text-4xl font-bold '>Your Conversations</h1>
         <p>Check out your conversations here. You can also create a new conversation by clicking the button below.</p>
 
-        <div className="flex justify-start items-center gap-2 flex-wrap lg:flex-no-wrap overflow-x-scroll">
-            <DashboardButton icon={<Plus />} text="Create New Conversation" subtext="Create a new conversation by clicking here." />
+        <div className="flex justify-start items-center gap-2 flex-wrap lg:flex-no-wrap overflow-x-scroll my-2">
+            <DashboardButton icon={<Plus />} text="Create New Conversation" subtext="Analyse a new conversation." />
         </div>
 
-        <ChatCarousel />
+        <div className="flex gap-2 flex-wrap">
+            <ChatCarousel />
+            <ChatCarousel />
+        </div>
     </div>
 }
 
@@ -36,7 +39,7 @@ const DashboardButton: React.FC<DashboardButtonProps> = ({ icon, text, subtext, 
       };
 
     return (
-        <Button variant="outline" className="h-auto w-full justify-start text-left max-w-[450px] ">
+        <Button variant="outline" className="h-auto w-full justify-start text-left max-w-[350px] ">
             <motion.div {...fadeIn} className="flex items-center">
                 <div className="mr-3 text-2xl">{icon}</div>
                 <div>
@@ -44,7 +47,7 @@ const DashboardButton: React.FC<DashboardButtonProps> = ({ icon, text, subtext, 
                         {text}
                         {beta && <span className="ml-2 px-1 py-0.5 text-xs bg-purple-600 rounded">Beta</span>}
                     </div>
-                    <div className="text-sm text-muted-foreground">{subtext}</div>
+                    <div className="text-sm text-muted-foreground text-wrap">{subtext}</div>
                 </div>
             </motion.div>
         </Button>

@@ -35,7 +35,7 @@ export const ChatCarousel: React.FC = () => {
   }, [])
 
   return (
-    <div className="w-full max-w-4xl mt-6 relative">
+    <div className="w-full max-w-4xl relative">
       <div className="relative rounded-lg border p-6">
         <div className="flex flex-col md:flex-row items-center">
           <div className="overflow-hidden mx-8 mb-8 w-full">
