@@ -166,7 +166,7 @@ export const NewChatModal: React.FC = () => {
                 {currentStep === 0 && (
                     <div className="grid grid-cols-1 gap-4">
                         <Button 
-                            variant="outline" 
+                            variant={chatData.platform === 'whatsapp' ? 'default' : 'outline'}
                             className="h-auto p-4 justify-start"
                             onClick={() => handlePlatformSelect('whatsapp')}
                         >
@@ -177,7 +177,7 @@ export const NewChatModal: React.FC = () => {
                         </Button>
                         
                         <Button 
-                            variant="outline" 
+                            variant={chatData.platform === 'messenger' ? 'default' : 'outline'}
                             className="h-auto p-4 justify-start"
                             onClick={() => handlePlatformSelect('messenger')}
                         >
@@ -188,7 +188,7 @@ export const NewChatModal: React.FC = () => {
                         </Button>
                         
                         <Button 
-                            variant="outline" 
+                            variant={chatData.platform === 'discord' ? 'default' : 'outline'}
                             className="h-auto p-4 justify-start"
                             onClick={() => handlePlatformSelect('discord')}
                         >
@@ -203,7 +203,7 @@ export const NewChatModal: React.FC = () => {
                 {currentStep === 1 && (
                     <div className="grid grid-cols-1 gap-4">
                         <Button 
-                            variant="outline" 
+                            variant={chatData.conversationType === 'significant_other' ? 'default' : 'outline'}
                             className="h-auto p-4 justify-start"
                             onClick={() => handleTypeSelect('significant_other')}
                         >
@@ -214,7 +214,7 @@ export const NewChatModal: React.FC = () => {
                         </Button>
                         
                         <Button 
-                            variant="outline" 
+                            variant={chatData.conversationType === 'friends' ? 'default' : 'outline'}
                             className="h-auto p-4 justify-start"
                             onClick={() => handleTypeSelect('friends')}
                         >
