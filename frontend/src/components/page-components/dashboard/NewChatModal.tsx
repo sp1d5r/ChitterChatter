@@ -8,8 +8,9 @@ import {
   DialogTrigger
 } from "../../shadcn/dialog";
 import { Button } from "../../shadcn/button";
-import { Plus, Check, Upload, Users } from "lucide-react";
+import { Plus, Check, Upload, Users, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { Input } from "../../shadcn/input";
 
 interface Steps {
     title: string;
@@ -17,27 +18,60 @@ interface Steps {
     completed: boolean;
 }
 
+interface ChatData {
+  platform: string | null;
+  conversationType: string | null;
+  chatFile: File | null;
+  members: string[];
+}
+
 export const NewChatModal: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
+  const [chatData, setChatData] = useState<ChatData>({
+    platform: null,
+    conversationType: null,
+    chatFile: null,
+    members: []
+  });
+  const [newMember, setNewMember] = useState('');
   
   const steps: Steps[] = [
     {
-        title: "Upload Chat",
-        subtitle: "Upload a WhatsApp chat export",
-        completed: false
+        title: "Select Platform",
+        subtitle: "Choose your chat platform",
+        completed: !!chatData.platform
     },
     {
-        title: "Select Message Type",
-        subtitle: "pick a message type to analyse",
-        completed: false
+        title: "Conversation Type",
+        subtitle: "What kind of conversation is this?",
+        completed: !!chatData.conversationType
+    },
+    {
+        title: "Upload Chat",
+        subtitle: "Upload your chat export",
+        completed: !!chatData.chatFile
     },
     {
         title: "Add Members",
         subtitle: "Add the members of the conversation",
-        completed: false
+        completed: chatData.members.length > 0
     }
-  ]   
+  ];
+
+  const handlePlatformSelect = (platform: string) => {
+    setChatData(prev => ({ ...prev, platform }));
+    handleNext();
+  };
+
+  const handleTypeSelect = (type: string) => {
+    setChatData(prev => ({ ...prev, conversationType: type }));
+    handleNext();
+  };
+
+  const handleFileUpload = (file: File) => {
+    setChatData(prev => ({ ...prev, chatFile: file }));
+    handleNext();
+  };
 
   const handleNext = () => {
     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
@@ -45,6 +79,23 @@ export const NewChatModal: React.FC = () => {
 
   const handleBack = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleAddMember = () => {
+    if (newMember.trim() && !chatData.members.includes(newMember.trim())) {
+      setChatData(prev => ({
+        ...prev,
+        members: [...prev.members, newMember.trim()]
+      }));
+      setNewMember('');
+    }
+  };
+
+  const handleRemoveMember = (memberToRemove: string) => {
+    setChatData(prev => ({
+      ...prev,
+      members: prev.members.filter(member => member !== memberToRemove)
+    }));
   };
 
   return (
@@ -97,9 +148,11 @@ export const NewChatModal: React.FC = () => {
         {/* Right Side - Content */}
         <div className="w-[80%] h-[80vh] p-4 py-6 flex flex-col gap-2">
             <DialogHeader>
-                <DialogTitle className="text-2xl font-bold">Create New Analysis</DialogTitle>
+                <DialogTitle className="text-2xl font-bold">
+                    {steps[currentStep].title}
+                </DialogTitle>
                 <DialogDescription>
-                    Start analyzing a new conversation by selecting your platform and uploading your chat.
+                    {steps[currentStep].subtitle}
                 </DialogDescription>
             </DialogHeader>
         
@@ -112,45 +165,148 @@ export const NewChatModal: React.FC = () => {
             >
                 {currentStep === 0 && (
                     <div className="grid grid-cols-1 gap-4">
-                        <Button variant="outline" className="h-auto p-4 justify-start">
-                        <div className="flex flex-col items-start">
-                            <span className="font-semibold">WhatsApp</span>
-                            <span className="text-sm text-muted-foreground">Upload a WhatsApp chat export</span>
-                        </div>
+                        <Button 
+                            variant="outline" 
+                            className="h-auto p-4 justify-start"
+                            onClick={() => handlePlatformSelect('whatsapp')}
+                        >
+                            <div className="flex flex-col items-start">
+                                <span className="font-semibold">WhatsApp</span>
+                                <span className="text-sm text-muted-foreground">Upload a WhatsApp chat export</span>
+                            </div>
                         </Button>
                         
-                        <Button variant="outline" className="h-auto p-4 justify-start">
-                        <div className="flex flex-col items-start">
-                            <span className="font-semibold">Facebook Messenger</span>
-                            <span className="text-sm text-muted-foreground">Connect your Messenger account</span>
-                        </div>
+                        <Button 
+                            variant="outline" 
+                            className="h-auto p-4 justify-start"
+                            onClick={() => handlePlatformSelect('messenger')}
+                        >
+                            <div className="flex flex-col items-start">
+                                <span className="font-semibold">Facebook Messenger</span>
+                                <span className="text-sm text-muted-foreground">Connect your Messenger account</span>
+                            </div>
                         </Button>
                         
-                        <Button variant="outline" className="h-auto p-4 justify-start">
-                        <div className="flex flex-col items-start">
-                            <span className="font-semibold">Discord</span>
-                            <span className="text-sm text-muted-foreground">Connect your Discord server</span>
-                        </div>
+                        <Button 
+                            variant="outline" 
+                            className="h-auto p-4 justify-start"
+                            onClick={() => handlePlatformSelect('discord')}
+                        >
+                            <div className="flex flex-col items-start">
+                                <span className="font-semibold">Discord</span>
+                                <span className="text-sm text-muted-foreground">Connect your Discord server</span>
+                            </div>
                         </Button>
                     </div>
                 )}
 
                 {currentStep === 1 && (
-                    <div className="flex flex-col gap-4">
-                        <div className="border-2 border-dashed rounded-lg p-8 text-center">
-                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                            <p className="mt-2">Drag and drop your chat export here</p>
-                        </div>
+                    <div className="grid grid-cols-1 gap-4">
+                        <Button 
+                            variant="outline" 
+                            className="h-auto p-4 justify-start"
+                            onClick={() => handleTypeSelect('significant_other')}
+                        >
+                            <div className="flex flex-col items-start">
+                                <span className="font-semibold">Significant Other</span>
+                                <span className="text-sm text-muted-foreground">Analyze conversations with your partner</span>
+                            </div>
+                        </Button>
+                        
+                        <Button 
+                            variant="outline" 
+                            className="h-auto p-4 justify-start"
+                            onClick={() => handleTypeSelect('friends')}
+                        >
+                            <div className="flex flex-col items-start">
+                                <span className="font-semibold">Friends</span>
+                                <span className="text-sm text-muted-foreground">Analyze group or individual chats with friends</span>
+                            </div>
+                        </Button>
                     </div>
                 )}
 
                 {currentStep === 2 && (
                     <div className="flex flex-col gap-4">
-                        <div className="flex flex-wrap gap-2">
-                            <Users className="h-6 w-6" />
-                            <p>Add conversation members</p>
+                        <div 
+                            className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+                            onDragOver={(e) => e.preventDefault()}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                const file = e.dataTransfer.files[0];
+                                handleFileUpload(file);
+                            }}
+                            onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.onchange = (e) => {
+                                    const file = (e.target as HTMLInputElement).files?.[0];
+                                    if (file) handleFileUpload(file);
+                                };
+                                input.click();
+                            }}
+                        >
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <p className="mt-2">
+                                {chatData.chatFile ? 
+                                    chatData.chatFile.name : 
+                                    'Drag and drop your chat export here or click to browse'
+                                }
+                            </p>
                         </div>
-                        {/* Add member inputs here */}
+                    </div>
+                )}
+
+                {currentStep === 3 && (
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-wrap gap-2 items-center mb-4">
+                            <Users className="h-6 w-6" />
+                            <p className="text-lg font-medium">Add conversation members</p>
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Input
+                                placeholder="Enter member name"
+                                value={newMember}
+                                onChange={(e) => setNewMember(e.target.value)}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleAddMember();
+                                    }
+                                }}
+                                className="flex-1"
+                            />
+                            <Button 
+                                onClick={handleAddMember}
+                                disabled={!newMember.trim()}
+                            >
+                                Add
+                            </Button>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2 mt-4">
+                            {chatData.members.map((member, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-2 bg-secondary px-3 py-1 rounded-full"
+                                >
+                                    <span>{member}</span>
+                                    <button
+                                        onClick={() => handleRemoveMember(member)}
+                                        className="hover:text-destructive transition-colors"
+                                    >
+                                        <X className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {chatData.members.length === 0 && (
+                            <p className="text-sm text-muted-foreground mt-2">
+                                No members added yet. Add at least one member to continue.
+                            </p>
+                        )}
                     </div>
                 )}
             </motion.div>
@@ -165,7 +321,14 @@ export const NewChatModal: React.FC = () => {
                 >
                     <p className="font-bold">Back</p>
                 </Button>
-                <Button onClick={handleNext}>
+                <Button 
+                    onClick={handleNext}
+                    disabled={
+                        (currentStep === 0 && !chatData.platform) ||
+                        (currentStep === 1 && !chatData.conversationType) ||
+                        (currentStep === 2 && !chatData.chatFile)
+                    }
+                >
                     <p className="font-bold">
                         {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
                     </p>
