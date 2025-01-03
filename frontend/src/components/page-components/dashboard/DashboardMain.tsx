@@ -3,6 +3,7 @@ import { Button } from "../../shadcn/button";
 import { Plus } from "lucide-react";
 import { motion } from 'framer-motion';
 import { ChatCarousel } from './ChatCarousel';
+import { NewChatModal } from './NewChatModal';
 
 export interface DashboardMainProps {
 
@@ -14,7 +15,7 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         <p>Check out your conversations here. You can also create a new conversation by clicking the button below.</p>
 
         <div className="flex justify-start items-center gap-2 flex-wrap lg:flex-no-wrap overflow-x-scroll my-2">
-            <DashboardButton icon={<Plus />} text="Create New Conversation" subtext="Analyse a new conversation." />
+            <NewChatModal />
         </div>
 
         <div className="flex gap-2 flex-wrap">

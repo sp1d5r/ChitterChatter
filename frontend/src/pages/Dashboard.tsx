@@ -146,7 +146,7 @@ const Logo = () => (
 );
 
 const LogoIcon = () => (
-<div className="font-normal flex space-x-2 items-center text-sm text-gray-800 dark:text-gray-200 py-1 relative z-2 -space-x-[0.08rem]">
+<div className="font-normal flex space-x-2 items-center text-sm text-gray-800 dark:text-gray-200 py-1 relative z-2 -space-x-[0.1rem]">
     <span className="text-xl font-bold text-neutral-800 dark:text-primary">C</span>
     <span className="text-xl font-bold text-neutral-900 dark:text-accent">C</span>
 </div>
