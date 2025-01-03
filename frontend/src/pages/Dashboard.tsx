@@ -82,11 +82,11 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className={cn(
-      "rounded-md flex flex-col md:flex-row bg-white dark:bg-neutral-950 w-full flex-1 mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden px-1 py-1",
+      "rounded-md flex flex-col md:flex-row dark:bg-background w-full flex-1 mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden px-1 py-1",
       "h-screen"
     )}>
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10 bg-gray-100 dark:bg-gray-800 rounded-l-xl">
+        <SidebarBody className="justify-between gap-10 bg-primary dark:bg-background border border-neutral-200 dark:border-primary rounded-l-xl">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-2 text-gray-800 dark:text-gray-200">
@@ -134,20 +134,21 @@ const Dashboard: React.FC = () => {
 
 const Logo = () => (
     <div className="font-normal flex space-x-2 items-center text-sm text-gray-800 dark:text-gray-200 py-1 relative z-20">
-        <div className="h-5 w-6 bg-gray-800 dark:bg-gray-200 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+        <LogoIcon />
         <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="font-medium whitespace-pre"
         >
-        Startup Name
+        ChitterChatter
         </motion.span>
 </div>
 );
 
 const LogoIcon = () => (
-<div className="font-normal flex space-x-2 items-center text-sm text-gray-800 dark:text-gray-200 py-1 relative z-20">
-    <div className="h-5 w-6 bg-gray-800 dark:bg-gray-200 rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+<div className="font-normal flex space-x-2 items-center text-sm text-gray-800 dark:text-gray-200 py-1 relative z-2 -space-x-[0.08rem]">
+    <span className="text-xl font-bold text-neutral-800 dark:text-primary">C</span>
+    <span className="text-xl font-bold text-neutral-900 dark:text-accent">C</span>
 </div>
 );
 
