@@ -41,6 +41,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     isProcessing: false,
     currentAnimationStep: 0,
   });
+  const [isOpen, setIsOpen] = useState(false);
   
   const steps: Steps[] = [
     {
@@ -122,12 +123,18 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     await new Promise(resolve => setTimeout(resolve, stepDelay));
     
     onFinish(chatData);
+    setIsOpen(false);
+    setAnimationState({ isProcessing: false, currentAnimationStep: 0 });
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="h-auto w-full justify-start text-left max-w-[350px]">
+        <Button 
+          variant="outline" 
+          className="h-auto w-full justify-start text-left max-w-[350px]"
+          onClick={() => setIsOpen(true)}
+        >
           <div className="flex items-center">
             <div className="mr-3 text-2xl"><Plus /></div>
             <div>
