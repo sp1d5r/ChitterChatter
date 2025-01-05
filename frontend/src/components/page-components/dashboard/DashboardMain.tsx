@@ -13,7 +13,7 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
 
     const handleNewChat = async (chatData: ChatData) => {
         try {
-            const response = await fetchWithAuth('chats', {
+            const response = await fetchWithAuth('api/chats', {
                 method: 'POST',
                 body: JSON.stringify(chatData)
             });

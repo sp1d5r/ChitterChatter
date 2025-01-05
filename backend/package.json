@@ -14,7 +14,6 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "shared": "workspace:*",
     "@notionhq/client": "^2.2.15",
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.5",
@@ -22,14 +21,17 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "firebase-admin": "^13.0.0",
+    "multer": "1.4.5-lts.1",
     "notion-to-md": "^3.1.1",
     "serverless-http": "^3.2.0",
+    "shared": "workspace:*",
     "stripe": "^17.3.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
   },
   "devDependencies": {
-    "@types/cors":  "^2.8.17",
+    "@types/cors": "^2.8.17",
+    "@types/multer": "^1.4.12",
     "eslint": "^8.57.1",
     "nodemon": "^3.1.7"
   }
