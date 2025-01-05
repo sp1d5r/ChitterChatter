@@ -1,7 +1,4 @@
 import React from 'react';
-import { Button } from "../../shadcn/button";
-import { Plus } from "lucide-react";
-import { motion } from 'framer-motion';
 import { ChatCarousel } from './ChatCarousel';
 import { NewChatModal } from './NewChatModal';
 import { ChatData } from 'shared/src/types/Chat';
@@ -28,34 +25,4 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
             <ChatCarousel />
         </div>
     </div>
-}
-
-interface DashboardButtonProps {
-    icon: React.ReactNode;
-    text: string;
-    subtext: string;
-    beta?: boolean;
-}
-
-const DashboardButton: React.FC<DashboardButtonProps> = ({ icon, text, subtext, beta = false }) => {
-    const fadeIn = {
-        initial: { opacity: 0 },
-        animate: { opacity: 1 },
-        transition: { duration: 0.7 }
-      };
-
-    return (
-        <Button variant="outline" className="h-auto w-full justify-start text-left max-w-[350px] ">
-            <motion.div {...fadeIn} className="flex items-center">
-                <div className="mr-3 text-2xl">{icon}</div>
-                <div>
-                    <div className="font-bold flex items-center">
-                        {text}
-                        {beta && <span className="ml-2 px-1 py-0.5 text-xs bg-purple-600 rounded">Beta</span>}
-                    </div>
-                    <div className="text-sm text-muted-foreground text-wrap">{subtext}</div>
-                </div>
-            </motion.div>
-        </Button>
-    );
 }
