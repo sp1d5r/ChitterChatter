@@ -30,10 +30,6 @@ export const createChat = async (req: Request, res: Response): Promise<void> => 
             return;
         }
 
-        // Debug logging
-        console.log('Request body:', req.body);
-        console.log('File:', req.file);
-
         // Access the uploaded file (now using req.file for single file upload)
         const chatFile = req.file;
         

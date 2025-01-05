@@ -1,12 +1,12 @@
 import { z } from "zod"; // For runtime type validation
 
-interface ClaudeConfig {
+export interface ClaudeConfig {
   apiKey: string;
   apiUrl?: string;
   model?: string;
 }
 
-interface ClaudeMessage {
+export interface ClaudeMessage {
   role: "user" | "assistant";
   content: Array<{
     type: "text" | "image";
@@ -52,7 +52,7 @@ export class ClaudeService {
     let lastError: Error | null = null;
     
     for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
+      try {        
         const response = await fetch(this.apiUrl, {
           method: "POST",
           headers,
@@ -60,7 +60,17 @@ export class ClaudeService {
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorBody = await response.json().catch(() => null);
+          console.log('Error response body:', errorBody);
+          
+          // Handle specific error types with clear messages
+          if (errorBody?.error?.type === 'invalid_request_error') {
+            if (errorBody.error.message.includes('prompt is too long')) {
+              throw new Error('The conversation is too long for Claude to process. Please try with fewer messages.');
+            }
+          }
+          
+          throw new Error(`Claude API Error: ${errorBody?.error?.message || `HTTP ${response.status}`}`);
         }
 
         const data = await response.json();
@@ -80,7 +90,9 @@ export class ClaudeService {
         if (result.success) {
           return result.data;
         } else {
+          console.log(result.error.message);
           lastError = new Error(`Validation error: ${result.error.message}`);
+          console.log(parsedContent);
           continue; // Retry on validation failure
         }
       } catch (error) {
@@ -89,7 +101,7 @@ export class ClaudeService {
         await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
       }
     }
-
+    console.log(lastError);
     throw lastError || new Error("Failed to get valid response from Claude");
   }
 
