@@ -78,8 +78,8 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         </div>
 
         <div className="flex gap-2 flex-wrap">
-            {chats.map(() => (
-                <ChatCarousel />
+            {chats.map((chat) => (
+                <ChatCarousel key={chat.id} chat={chat} />
             ))}
         </div>
     </div>

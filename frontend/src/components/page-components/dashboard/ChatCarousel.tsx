@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "../../shadcn/button";
+import { ChatData } from 'shared';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -8,7 +9,11 @@ interface ChatCard {
   color: string;
 }
 
-export const ChatCarousel: React.FC = () => {
+export interface ChatCarouselProps {  
+    chat: ChatData;
+}
+
+export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat }) => {
   const [activeCard, setActiveCard] = useState(0);
   
   const cards: ChatCard[] = [
@@ -61,25 +66,15 @@ export const ChatCarousel: React.FC = () => {
           </div>
 
           <div className="flex flex-col gap-1">
-            <p className="text-2xl font-bold">The Family Group Chat</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Facebook Messenger</p>
+            <p className="text-2xl font-bold">{chat.conversationType}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{chat.platform}</p>
             <div className="flex items-center gap-2 flex-wrap">
-                <div className="flex items-center gap-2">
-                    <div className="rounded-full h-6 w-6 bg-blue-200 dark:bg-blue-800 rounded-lg shadow-sm" />
-                    <p>Haji</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="rounded-full h-6 w-6 bg-blue-200 dark:bg-blue-800 rounded-lg shadow-sm" />
-                    <p>Haji</p>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="rounded-full h-6 w-6 bg-blue-200 dark:bg-blue-800 rounded-lg shadow-sm" />
-                    <p>Haji</p>
-                </div>
-                <div className="flex items-center gap-2">
-                <div className="rounded-full h-6 w-6 bg-blue-200 dark:bg-blue-800 rounded-lg shadow-sm" />
-                    <p>Haji</p>
-                </div>
+                {chat.members.map((member) => (
+                    <div className="flex items-center gap-2">
+                        <div className="rounded-full h-6 w-6 bg-blue-200 dark:bg-blue-800 rounded-lg shadow-sm" />
+                        <p>{member}</p>
+                    </div>
+                ))}
             </div>
           </div>
         </div>
