@@ -229,11 +229,11 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                   <motion.p
                     key={index}
                     className="absolute left-0 right-0 text-xl font-bold text-black px-8"
-                    initial={{ opacity: 0, y: 100 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ 
                       opacity: animationState.currentAnimationStep === index ? 1 : 0,
                       y: animationState.currentAnimationStep === index ? 0 : 
-                         animationState.currentAnimationStep > index ? -100 : 100
+                         animationState.currentAnimationStep > index ? -10 : 10
                     }}
                     transition={{ duration: 0.5 }}
                   >
