@@ -2,14 +2,31 @@ import React from 'react';
 import { ChatCarousel } from './ChatCarousel';
 import { NewChatModal } from './NewChatModal';
 import { ChatData } from 'shared/src/types/Chat';
+import { useApi } from '../../../contexts/ApiContext';
 
 export interface DashboardMainProps {
 
 }
 
 export const DashboardMain : React.FC<DashboardMainProps> = () => {
-    const handleNewChat = (chatData: ChatData) => {
-        console.log('New Chat Data:', chatData);
+    const { fetchWithAuth } = useApi();
+
+    const handleNewChat = async (chatData: ChatData) => {
+        try {
+            const response = await fetchWithAuth('chats', {
+                method: 'POST',
+                body: JSON.stringify(chatData)
+            });
+            
+            const newChat = await response.json();
+            console.log('Chat created successfully:', newChat);
+            
+            // Here you could update local state, show a success notification, etc.
+            
+        } catch (error) {
+            console.error('Failed to create chat:', error);
+            // Here you could show an error notification
+        }
     };
 
     return <div className="w-full h-full dark:text-white flex flex-col gap-2">
