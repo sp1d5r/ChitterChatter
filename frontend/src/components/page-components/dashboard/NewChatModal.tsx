@@ -146,67 +146,72 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
           animate={{ width: animationState.isProcessing ? '100%' : '20%' }}
           transition={{ duration: 0.5 }}
         >
-            <div className="flex flex-col gap-2">
+          {!animationState.isProcessing && (
+            <>
+              <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-2">
                     <p className="text-2xl font-bold text-black">Steps</p>
                     <p className="text-sm text-muted-foreground">Follow the steps to create a new analysis.</p>
                 </div>
-            </div>
-            {
+              </div>
+              {
                 steps.map((step, index) => (
-                    <div className="flex flex-row gap-2 items-center text-black">
-                        <div className="w-8 h-8 rounded-full border border-black flex items-center justify-center">
-                            {index < currentStep ? (
-                                <motion.div
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    transition={{ duration: 0.2 }}
-                                >
-                                    <Check className="w-4 h-4" />
-                                </motion.div>
-                            ) : (
-                                <p className="font-bold">{index + 1}</p>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <p className="font-bold">{step.title}</p>
-                        </div>
+                  <div className="flex flex-row gap-2 items-center text-black">
+                    <div className="w-8 h-8 rounded-full border border-black flex items-center justify-center">
+                      {index < currentStep ? (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Check className="w-4 h-4" />
+                        </motion.div>
+                      ) : (
+                        <p className="font-bold">{index + 1}</p>
+                      )}
                     </div>
+                    <div className="flex flex-col gap-2">
+                      <p className="font-bold">{step.title}</p>
+                    </div>
+                  </div>
                 ))
-            }
+              }
+            </>
+          )}
 
-            {animationState.isProcessing && (
-                <motion.div 
-                    className="absolute inset-0 flex flex-col items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                >
-                    <Loader2 className="w-12 h-12 animate-spin mb-4" />
-                    
-                    <motion.div className="text-center">
-                        {[
-                            `Selected ${chatData.platform} as your platform`,
-                            `Picked ${chatData.conversationType} conversation type`,
-                            `Added ${chatData.members.length} members to analyze`,
-                            "Securely processing your chat, sit tight while we work our magic"
-                        ].map((text, index) => (
-                            <motion.p
-                                key={index}
-                                className="absolute left-0 right-0 text-xl font-bold text-black"
-                                initial={{ opacity: 0, y: 50 }}
-                                animate={{ 
-                                    opacity: animationState.currentAnimationStep === index ? 1 : 0,
-                                    y: animationState.currentAnimationStep === index ? 0 : -50
-                                }}
-                                transition={{ duration: 0.5 }}
-                            >
-                                {text}
-                            </motion.p>
-                        ))}
-                    </motion.div>
-                </motion.div>
-            )}
+          {animationState.isProcessing && (
+            <motion.div 
+              className="absolute inset-0 flex flex-col items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Loader2 className="w-12 h-12 animate-spin mb-4" />
+              
+              <motion.div className="text-center relative h-[100px]">
+                {[
+                  `Selected ${chatData.platform} as your platform`,
+                  `Picked ${chatData.conversationType} conversation type`,
+                  `Added ${chatData.members.length} members to analyze`,
+                  "Securely processing your chat, sit tight while we work our magic"
+                ].map((text, index) => (
+                  <motion.p
+                    key={index}
+                    className="absolute left-0 right-0 text-xl font-bold text-black px-8"
+                    initial={{ opacity: 0, y: 100 }}
+                    animate={{ 
+                      opacity: animationState.currentAnimationStep === index ? 1 : 0,
+                      y: animationState.currentAnimationStep === index ? 0 : 
+                         animationState.currentAnimationStep > index ? -100 : 100
+                    }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {text}
+                  </motion.p>
+                ))}
+              </motion.div>
+            </motion.div>
+          )}
         </motion.div>
 
         {!animationState.isProcessing && (
