@@ -39,9 +39,9 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     if (options.body instanceof FormData) {
       console.log('FormData contents:');
-      for (const [key, value] of options.body.entries()) {
+      Array.from(options.body.entries()).forEach(([key, value]) => {
         console.log(`${key}:`, value);
-      }
+      });
     }
 
     const response = await fetch(`${apiUrl}/${endpoint}`, {
