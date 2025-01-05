@@ -29,6 +29,7 @@ export interface NewChatModalProps {
 }
 
 export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
+  const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [chatData, setChatData] = useState<ChatData>({
     platform: null,
@@ -41,7 +42,6 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     isProcessing: false,
     currentAnimationStep: 0,
   });
-  const [isOpen, setIsOpen] = useState(false);
   
   const steps: Steps[] = [
     {
@@ -124,11 +124,35 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     
     onFinish(chatData);
     setIsOpen(false);
+    resetModalState();
     setAnimationState({ isProcessing: false, currentAnimationStep: 0 });
   };
 
+  const resetModalState = () => {
+    setCurrentStep(0);
+    setChatData({
+      platform: null,
+      conversationType: null,
+      chatFile: null,
+      members: []
+    });
+    setNewMember('');
+    setAnimationState({
+      isProcessing: false,
+      currentAnimationStep: 0,
+    });
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (!open) {
+          resetModalState();
+        }
+      }}
+    >
       <DialogTrigger asChild>
         <Button 
           variant="outline" 
