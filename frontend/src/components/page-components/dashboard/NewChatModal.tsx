@@ -219,7 +219,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
             >
               <Loader2 className="w-12 h-12 animate-spin mb-4" />
               
-              <motion.div className="text-center relative h-[100px]">
+              <motion.div className="text-center w-full relative h-[100px]">
                 {[
                   `Selected ${chatData.platform} as your platform`,
                   `Picked ${chatData.conversationType} conversation type`,
