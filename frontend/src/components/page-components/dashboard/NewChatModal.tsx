@@ -11,18 +11,12 @@ import { Button } from "../../shadcn/button";
 import { Plus, Check, Upload, Users, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "../../shadcn/input";
+import { ChatData } from "shared";
 
 interface Steps {
     title: string;
     subtitle: string;
     completed: boolean;
-}
-
-interface ChatData {
-  platform: string | null;
-  conversationType: string | null;
-  chatFile: File | null;
-  members: string[];
 }
 
 export const NewChatModal: React.FC = () => {
@@ -322,7 +316,13 @@ export const NewChatModal: React.FC = () => {
                     <p className="font-bold">Back</p>
                 </Button>
                 <Button 
-                    onClick={handleNext}
+                    onClick={() => {
+                        if (currentStep === steps.length - 1) {
+                            console.log('Chat Data:', chatData);
+                        } else {
+                            handleNext();
+                        }
+                    }}
                     disabled={
                         (currentStep === 0 && !chatData.platform) ||
                         (currentStep === 1 && !chatData.conversationType) ||
