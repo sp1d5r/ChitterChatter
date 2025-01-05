@@ -21,7 +21,7 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         if (authState.user?.uid) {
             // Set up real-time listener for chats
             unsubscribe = FirebaseDatabaseService.listenToQuery<ChatData>(
-                'chats',
+                `chats/${authState.user.uid}/conversations`,
                 'userId', // assuming this is the field that stores the user ID
                 authState.user.uid,
                 'createdAt', // assuming you have a timestamp field to order by
@@ -78,8 +78,9 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         </div>
 
         <div className="flex gap-2 flex-wrap">
-            <ChatCarousel />
-            <ChatCarousel />
+            {chats.map(() => (
+                <ChatCarousel />
+            ))}
         </div>
     </div>
 }
