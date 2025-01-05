@@ -111,6 +111,8 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     
     const stepDelay = 2000;
     
+    const processingPromise = onFinish(chatData);
+    
     await new Promise(resolve => setTimeout(resolve, stepDelay));
     setAnimationState(prev => ({ ...prev, currentAnimationStep: 1 }));
     
@@ -120,9 +122,11 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     await new Promise(resolve => setTimeout(resolve, stepDelay));
     setAnimationState(prev => ({ ...prev, currentAnimationStep: 3 }));
     
-    await new Promise(resolve => setTimeout(resolve, stepDelay));
+    await Promise.all([
+        processingPromise,
+        new Promise(resolve => setTimeout(resolve, stepDelay))
+    ]);
     
-    onFinish(chatData);
     setIsOpen(false);
     resetModalState();
     setAnimationState({ isProcessing: false, currentAnimationStep: 0 });
