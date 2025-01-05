@@ -19,7 +19,11 @@ interface Steps {
     completed: boolean;
 }
 
-export const NewChatModal: React.FC = () => {
+export interface NewChatModalProps {
+    onFinish: (chatData: ChatData) => void;
+}
+
+export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [chatData, setChatData] = useState<ChatData>({
     platform: null,
@@ -319,6 +323,7 @@ export const NewChatModal: React.FC = () => {
                     onClick={() => {
                         if (currentStep === steps.length - 1) {
                             console.log('Chat Data:', chatData);
+                            onFinish(chatData);
                         } else {
                             handleNext();
                         }
