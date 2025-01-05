@@ -1,7 +1,11 @@
 import { ChatData } from "shared";
 
+// Create a new type for processed chat data without the file
+type ProcessedChatData = Omit<ChatData, 'chatFile'> & {
+    chatContent: string;
+};
 
-interface StoredChat extends ChatData {
+interface StoredChat extends ProcessedChatData {
     id: string;
     userId: string;
     createdAt: Date;
@@ -9,23 +13,37 @@ interface StoredChat extends ChatData {
 }
 
 export class ChatService {
-
-  async createChat(userId: string, chatData: ChatData): Promise<StoredChat> {
-        // Here you would typically:
-        // 1. Validate the data
-        // 2. Store it in your database
-        // 3. Queue any background processing if needed
+    async createChat(
+        userId: string, 
+        chatData: ProcessedChatData
+    ): Promise<StoredChat> {
+        // Log the incoming data
+        console.log('Received chat data:', {
+            userId,
+            platform: chatData.platform,
+            conversationType: chatData.conversationType,
+            members: chatData.members,
+            contentLength: chatData.chatContent.length,
+            contentPreview: chatData.chatContent.substring(0, 100) + '...'
+        });
         
         const newChat: StoredChat = {
-            ...chatData,
-            id: crypto.randomUUID(), // Or your DB's ID generation
+            id: crypto.randomUUID(),
             userId,
+            platform: chatData.platform,
+            conversationType: chatData.conversationType,
+            members: chatData.members,
+            chatContent: chatData.chatContent,
             createdAt: new Date(),
             status: 'pending'
         };
 
-        // TODO: Add your database storage logic here
-        console.log('Creating new chat:', newChat);
+        // Log the created chat object
+        console.log('Created new chat:', {
+            ...newChat,
+            contentLength: newChat.chatContent.length,
+            contentPreview: newChat.chatContent.substring(0, 100) + '...'
+        });
 
         return newChat;
     }

@@ -28,28 +28,11 @@ const corsOptions = {
   origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Your frontend URL
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'stripe-signature'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
-// Apply CORS to all routes EXCEPT the webhook
-app.use((req, res, next) => {
-  if (req.path === '/api/payments/webhook') {
-    // Skip CORS for webhooks as Stripe needs raw body
-    next();
-  } else {
-    cors(corsOptions)(req, res, next);
-  }
-});
-
-// Parse JSON bodies for all routes EXCEPT webhook
-app.use((req, res, next) => {
-  if (req.path === '/api/payments/webhook') {
-    // Use raw body for webhook
-    next();
-  } else {
-    express.json()(req, res, next);
-  }
-});
+// Apply CORS
+app.use(cors(corsOptions));
 
 // Routes 
 app.use('/api/articles', articleRoutes);

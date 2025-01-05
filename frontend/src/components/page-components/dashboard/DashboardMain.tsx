@@ -13,19 +13,26 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
 
     const handleNewChat = async (chatData: ChatData) => {
         try {
+            const formData = new FormData();
+            
+            formData.append('platform', chatData.platform as string);
+            formData.append('conversationType', chatData.conversationType as string);
+            formData.append('members', JSON.stringify(chatData.members));
+            
+            if (chatData.chatFile) {
+                formData.append('chatFile', chatData.chatFile);
+            }
+
             const response = await fetchWithAuth('api/chats', {
                 method: 'POST',
-                body: JSON.stringify(chatData)
+                body: formData
             });
             
             const newChat = await response.json();
             console.log('Chat created successfully:', newChat);
             
-            // Here you could update local state, show a success notification, etc.
-            
         } catch (error) {
             console.error('Failed to create chat:', error);
-            // Here you could show an error notification
         }
     };
 
