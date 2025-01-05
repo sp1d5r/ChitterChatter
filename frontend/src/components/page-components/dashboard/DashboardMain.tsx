@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatCarousel } from './ChatCarousel';
 import { NewChatModal } from './NewChatModal';
 import { ChatData } from 'shared/src/types/Chat';
 import { useApi } from '../../../contexts/ApiContext';
+import { useAuth } from '../../../contexts/AuthenticationProvider';
+import { FirebaseDatabaseService } from 'shared';
 
 export interface DashboardMainProps {
 
@@ -10,6 +12,37 @@ export interface DashboardMainProps {
 
 export const DashboardMain : React.FC<DashboardMainProps> = () => {
     const { fetchWithAuth } = useApi();
+    const { authState } = useAuth();
+    const [chats, setChats] = useState<ChatData[]>([]);
+
+    useEffect(() => {
+        let unsubscribe: (() => void) | undefined;
+
+        if (authState.user?.uid) {
+            // Set up real-time listener for chats
+            unsubscribe = FirebaseDatabaseService.listenToQuery<ChatData>(
+                'chats',
+                'userId', // assuming this is the field that stores the user ID
+                authState.user.uid,
+                'createdAt', // assuming you have a timestamp field to order by
+                (updatedChats) => {
+                    if (updatedChats) {
+                        setChats(updatedChats);
+                    }
+                },
+                (error) => {
+                    console.error('Error listening to chats:', error);
+                }
+            );
+        }
+
+        // Cleanup listener when component unmounts or user changes
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
+    }, [authState.user]);
 
     const handleNewChat = async (chatData: ChatData) => {
         try {
