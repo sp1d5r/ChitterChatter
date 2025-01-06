@@ -84,7 +84,7 @@ export interface DatabaseService {
       collectionPath: string,
       queryField: string,
       queryValue: unknown,
-      orderByField: string,
+      orderByField: { field: string; direction?: OrderByDirection },
       onUpdate: UpdateCallback<T[]>,
       onError: (error: FirestoreError) => void
     ): Unsubscribe;

@@ -243,7 +243,7 @@ const FirebaseDatabaseService: DatabaseService = {
     collectionPath: string,
     queryField: string,
     queryValue: unknown,
-    orderByField: string,
+    orderByField: { field: string; direction?: OrderByDirection },
     onUpdate: UpdateCallback<T[]>,
     onError: (error: FirestoreError) => void = (err) => { console.error(err.message); },
   ): Unsubscribe {
@@ -251,7 +251,7 @@ const FirebaseDatabaseService: DatabaseService = {
     const q = query(
       collection(db, collectionPath),
       where(queryField, '==', queryValue),
-      orderBy(orderByField),
+      orderBy(orderByField.field, orderByField.direction),
     );
 
     return onSnapshot(

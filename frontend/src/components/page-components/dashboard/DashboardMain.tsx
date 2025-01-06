@@ -24,7 +24,7 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
                 `chats/${authState.user.uid}/conversations`,
                 'userId', // assuming this is the field that stores the user ID
                 authState.user.uid,
-                'createdAt', // assuming you have a timestamp field to order by
+                { field: 'createdAt', direction: 'desc' },
                 (updatedChats) => {
                     if (updatedChats) {
                         setChats(updatedChats);
@@ -76,7 +76,7 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         <NewChatModal onFinish={handleNewChat} />
         
         <div className="flex gap-2 flex-wrap">
-            {chats.reverse().map((chat) => (
+            {chats.map((chat) => (
                 <ChatCarousel key={chat.id} chat={chat} />
             ))}
         </div>
