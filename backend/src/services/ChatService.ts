@@ -21,7 +21,7 @@ interface StoredChatMetadata {
     // Add any other metadata you want to track
 }
 
-// Define detailed analysis schemas
+// Individual member analysis (existing)
 const MemberAnalysisSchema = z.object({
   memberId: z.string(),
   redFlagScore: z.number().min(0).max(10),
@@ -39,7 +39,45 @@ const MemberAnalysisSchema = z.object({
   cringeMoments: z.array(z.string()),
 });
 
-const ChatAnalysisSchema = z.array(MemberAnalysisSchema);
+// New fun, qualitative schemas
+const ChatSuperlativesSchema = z.object({
+    awards: z.array(z.object({
+        title: z.string(),
+        recipient: z.string(),
+        reason: z.string(),
+    })),
+    // Example: { title: "Chaos Agent of the Year", recipient: "Alice", reason: "Has a talent for turning any conversation about groceries into a philosophical debate about the meaning of life" }
+});
+
+const GroupVibeSchema = z.object({
+    chaosLevel: z.object({
+        rating: z.number().min(0).max(10),
+        description: z.string(),
+    }),
+    personalityType: z.string(), // e.g., "Chaotic Good with a side of Meme Addiction"
+    groupTraditions: z.array(z.string()), // e.g., ["Always responds to serious questions with GIFs", "Nobody acknowledges Mondays before noon"]
+    collectiveQuirks: z.array(z.string()), // e.g., ["Inexplicable hatred of the 🙂 emoji", "Every conversation eventually leads to food"]
+});
+
+const MemorableGroupMomentsSchema = z.object({
+    epicDiscussions: z.array(z.object({
+        topic: z.string(),
+        highlight: z.string(),
+    })),
+    runningJokes: z.array(z.object({
+        joke: z.string(),
+        context: z.string(),
+    })),
+    legendaryMisunderstandings: z.array(z.string()),
+});
+
+// Combined analysis type
+const CompleteChatAnalysisSchema = z.object({
+    memberAnalysis: z.array(MemberAnalysisSchema),
+    superlatives: ChatSuperlativesSchema,
+    groupVibe: GroupVibeSchema,
+    memorableMoments: MemorableGroupMomentsSchema,
+});
 
 export class ChatService {
     private claudeService: ClaudeService;
@@ -115,170 +153,81 @@ export class ChatService {
         chatId: string,
         chatData: ProcessedChatData
     ) {
-        const trimmedContent = this.trimChatContent(chatData.chatContent);
-        
-        const systemPrompt = `
-            You are a witty chat analyzer with a great sense of humor! Your job is to find the funny quirks and entertaining patterns in chat conversations. Think of yourself as a comedy detective looking for amusing behavioral patterns.
+        try {
+            const trimmedContent = this.trimChatContent(chatData.chatContent);
             
-            For each participant, evaluate with a fun twist:
-            1. Red Flag Score (0-10):
-               - Look for hilarious dating red flags like "uses too many emojis 🤪"
-               - Spot people who say "literally" literally too much
-               - Notice if they're weirdly obsessed with their cat
-               - Give funny reasons for any scores (the more ridiculous the better!)
-            
-            2. Toxicity Score (0-10):
-               - More about sass levels than actual toxicity
-               - Are they the group's designated drama queen?
-               - Do they use passive-aggressive "k" responses?
-            
-            3. Sentiment Score (-1 to 1):
-               - Are they the group's eternal optimist or resident grump?
-               - Do they respond to everything with memes?
-            
-            4. Topic Analysis:
-               - What random topics do they always circle back to?
-               - Do they somehow always bring up their ex?
-               - Track their weird obsessions
-            
-            5. Quirks:
-               - List their funny chat habits
-               - Do they always type in ALL CAPS?
-               - Never use punctuation?
-               - Send voice messages at 3 AM?
-            
-            6. Funny Score (0-10):
-               - How intentionally (or unintentionally) funny are they?
-               - Are they the group's comedian or comic relief?
-            
-            7. Funny Moments:
-               - Capture their best unintentionally hilarious moments
-               - Note any running jokes they've started
-               - Record their most memorable quotes
-            
-            8. Cringe Score (0-10):
-               - How cringe-worthy are they?
-               - Are they the group's designated cringe master?
-               - Do they always send embarrassing photos?
-               - Give funny reasons for any scores (the more ridiculous the better!)
-            
-            9. Cringe Moments:
-               - Capture their most cringe-worthy moments
-               - Note any running jokes they've started
-               - Record their most memorable quotes
+            // Split analysis into separate focused functions
+            const [memberAnalysis, superlatives, groupVibe, memorableMoments] = await Promise.all([
+                this.analyzeMemberBehaviors(trimmedContent, chatData.members),
+                this.analyzeSuperlatives(trimmedContent, chatData.members),
+                this.analyzeGroupVibe(trimmedContent),
+                this.analyzeMemorableMoments(trimmedContent)
+            ]);
 
-            Remember: Keep it light and fun! We're looking for endearing quirks and amusing patterns, not serious issues.
+            const analysis = {
+                memberAnalysis,
+                superlatives,
+                groupVibe,
+                memorableMoments
+            };
+
+            await this.storeAnalysisResults(userId, chatId, analysis);
+        } catch (error) {
+            await this.handleAnalysisError(userId, chatId, error);
+        }
+    }
+
+    private async analyzeSuperlatives(content: string, members: string[]) {
+        const systemPrompt = `
+            You're a chat group's personal awards show host! Your job is to hand out funny, 
+            creative superlative awards to chat members. Think yearbook superlatives meets 
+            comedy awards show.
+
+            Examples of awards:
+            - "Master of Derailing Conversations in the Best Way"
+            - "Honorary Professor of GIF Responses"
+            - "Champion of Reviving Dead Chats at 3 AM"
+            - "Most Likely to Turn Any Discussion into a Food Debate"
             
-            Return results in this JSON format (no additional text):
-            [
-                {
-                    "memberId": "string",
-                    "redFlagScore": number,
-                    "redFlagReasons": ["uses comic sans in work emails", "thinks pineapple belongs on pizza"],
-                    "toxicityScore": number,
-                    "sentimentScore": number,
-                    "topicAnalysis": [{"topic": "string", "frequency": number}],
-                    "quirks": ["types 'hehe' after everything hehe", "sends good morning texts at midnight"],
-                    "funnyScore": number,
-                    "funnyMoments": ["that time they tried to explain NFTs to grandma"],
-                    "cringeScore": number,
-                    "cringeMoments": ["that time they sent a photo of their cat in a box"]
-                }
-            ]
+            For each award:
+            - Be specific and reference actual chat patterns
+            - Include a funny reason why they won
+            - Keep it light and playful
+            - Focus on unique behaviors and running jokes
+
+            Return only the JSON, no additional text.
         `;
 
-        try {
-            const analysis = await this.claudeService.query(
-                [{
-                    role: "user",
-                    content: [{
-                        type: "text",
-                        text: `${trimmedContent} \n\n. Please perform a comprehensive analysis of this chat history between ${chatData.members.join(', ')}. You are to return  Return results in this JSON format:
-            [
-                {
-                    "memberId": "string",
-                    "redFlagScore": number,
-                    "redFlagReasons": ["reason1", "reason2"],
-                    "toxicityScore": number,
-                    "sentimentScore": number,
-                    "topicAnalysis": [
-                        {"topic": "string", "frequency": number}
-                    ],
-                    "quirks": ["types 'hehe' after everything hehe", "sends good morning texts at midnight"],
-                    "funnyScore": number,
-                    "funnyMoments": ["that time they tried to explain NFTs to grandma"],
-                    "cringeScore": number,
-                    "cringeMoments": ["that time they sent a photo of their cat in a box"]
-                }
-            ]
-                  return an array of JSON objects with in the correct format and types. Just return the object itself, as this will be used for further parsing. 
-            `
-                    }]
-                }],
-                ChatAnalysisSchema,
-                systemPrompt
-            );
-
-            // Update the chat metadata with analysis results using your Firebase service
-            FirebaseDatabaseService.updateDocument(
-                `chats/${userId}/conversations`,
-                chatId,
-                {
-                    analysis: {
-                        results: analysis,
-                        analyzedAt: new Date(),
-                        status: 'completed'
-                    }
-                },
-                () => {
-                    // Success callback
-                    console.log('Analysis stored successfully');
-                    this.handleHighRiskScores(userId, chatId, analysis);
-                },
-                (error) => {
-                    // Error callback
-                    console.error('Failed to store analysis:', error);
-                }
-            );
-
-        } catch (error) {
-            FirebaseDatabaseService.updateDocument(
-                `chats/${userId}/conversations`,
-                chatId,
-                {
-                    analysis: {
-                        status: 'failed',
-                        error: (error as Error).message
-                    }
-                },
-                undefined,
-                (error) => console.error('Failed to update error status:', error)
-            );
-        }
-    }
-
-    private handleHighRiskScores(
-        userId: string,
-        chatId: string,
-        analysis: z.infer<typeof ChatAnalysisSchema>
-    ) {
-        const highRiskMembers = analysis.filter(member => 
-            member.redFlagScore > 7 || member.toxicityScore > 7
+        return await this.claudeService.query(
+            [{ role: "user", content: [{ type: "text", text: content }] }],
+            ChatSuperlativesSchema,
+            systemPrompt
         );
-
-        if (highRiskMembers.length > 0) {
-            FirebaseDatabaseService.updateDocument(
-                `chats/${userId}/conversations`,
-                chatId,
-                {
-                    highRiskAlert: {
-                        members: highRiskMembers,
-                        detectedAt: new Date()
-                    }
-                },
-                () => console.log('High risk alert stored'),
-                (error) => console.error('Failed to store high risk alert:', error)
-            );
-        }
     }
+
+    private async analyzeGroupVibe(content: string) {
+        const systemPrompt = `
+            You're a chat group personality analyst with a sense of humor! Analyze this group's 
+            collective vibe and quirks. Don't focus on numbers or statistics - instead, capture 
+            the essence of how this group interacts.
+
+            Look for:
+            - The group's "personality type" (be creative and funny)
+            - Weird traditions that have formed
+            - Collective quirks and habits
+            - Inside jokes and references
+            - How chaos manifests in this group
+
+            Keep it light, fun, and focused on the unique dynamics that make this group special.
+            Return only the JSON, no additional text.
+        `;
+
+        return await this.claudeService.query(
+            [{ role: "user", content: [{ type: "text", text: content }] }],
+            GroupVibeSchema,
+            systemPrompt
+        );
+    }
+
+    // ... implement other analysis functions with similar fun, qualitative approaches ...
 }
