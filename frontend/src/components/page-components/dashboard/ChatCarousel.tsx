@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "../../shadcn/button";
 import { ChatData } from 'shared';
-import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trash2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, ResponsiveContainer, Cell } from 'recharts';
 import {
@@ -32,7 +32,12 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
       title: "Member Analysis",
       content: () => {
         if (!chat.analysis) return <p>Analysis not started</p>;
-        if (chat.analysis.status === 'failed') return <p>Error: {chat.analysis.error}</p>;
+        if (chat.analysis.status === 'failed') return (
+          <div className="h-full flex flex-col items-center justify-center text-destructive">
+            <AlertCircle className="h-8 w-8 mb-2" />
+            <p>Sorry, analysis failed</p>
+          </div>
+        );
         if (chat.analysis.status === 'pending' || chat.analysis.status === 'processing') {
           return <p>Analysis in progress...</p>;
         }
@@ -64,7 +69,12 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
       title: "Group Vibe",
       content: () => {
         if (!chat.groupVibe) return <p>Analysis not started</p>;
-        if (chat.groupVibe.status === 'failed') return <p>Error: {chat.groupVibe.error}</p>;
+        if (chat.groupVibe.status === 'failed') return (
+          <div className="h-full flex flex-col items-center justify-center text-destructive">
+            <AlertCircle className="h-8 w-8 mb-2" />
+            <p>Sorry, analysis failed</p>
+          </div>
+        );
         if (chat.groupVibe.status === 'pending' || chat.groupVibe.status === 'processing') {
           return <p>Analysis in progress...</p>;
         }
@@ -86,7 +96,12 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
       title: "Memorable Moments",
       content: () => {
         if (!chat.memorableMoments) return <p>Analysis not started</p>;
-        if (chat.memorableMoments.status === 'failed') return <p>Error: {chat.memorableMoments.error}</p>;
+        if (chat.memorableMoments.status === 'failed') return (
+          <div className="h-full flex flex-col items-center justify-center text-destructive">
+            <AlertCircle className="h-8 w-8 mb-2" />
+            <p>Sorry, analysis failed</p>
+          </div>
+        );
         if (chat.memorableMoments.status === 'pending' || chat.memorableMoments.status === 'processing') {
           return <p>Analysis in progress...</p>;
         }
@@ -107,7 +122,12 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
       title: "Superlatives",
       content: () => {
         if (!chat.superlatives) return <p>Analysis not started</p>;
-        if (chat.superlatives.status === 'failed') return <p>Error: {chat.superlatives.error}</p>;
+        if (chat.superlatives.status === 'failed') return (
+          <div className="h-full flex flex-col items-center justify-center text-destructive">
+            <AlertCircle className="h-8 w-8 mb-2" />
+            <p>Sorry, analysis failed</p>
+          </div>
+        );
         if (chat.superlatives.status === 'pending' || chat.superlatives.status === 'processing') {
           return <p>Analysis in progress...</p>;
         }
@@ -200,8 +220,8 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
                   transition={{ duration: 0.5 }}
                 >
                   <div className="space-y-4">
-                    <h3 className="font-medium">{card.title}</h3>
-                    <div className="w-full h-48 rounded-lg p-4 border">
+                    <h3 className="font-bold text-2xl">{card.title}</h3>
+                    <div className="w-full h-48 rounded-lg">
                       {card.content()}
                     </div>
                   </div>
