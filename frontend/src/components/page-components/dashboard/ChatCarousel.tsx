@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "../../shadcn/button";
 import { ChatData } from 'shared';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, ResponsiveContainer, Cell } from 'recharts';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../shadcn/dialog";
 
 interface ChatCard {
   title: string;
@@ -12,9 +21,10 @@ interface ChatCard {
 
 export interface ChatCarouselProps {  
     chat: ChatData;
+    onDelete?: (chatId: string) => void;
 }
 
-export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat }) => {
+export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) => {
   const [activeCard, setActiveCard] = useState(0);
   
   const cards: ChatCard[] = [
@@ -133,6 +143,48 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat }) => {
   return (
     <div className="w-full max-w-4xl relative">
       <div className="relative rounded-lg border p-6">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 hover:bg-destructive/10"
+            >
+              <Trash2 className="h-4 w-4 text-destructive" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Chat</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this chat? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="mt-4">
+              <Button
+                variant="ghost"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const closeEvent = new Event('close');
+                  e.currentTarget.dispatchEvent(closeEvent);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (onDelete && chat.id) {
+                    onDelete(chat.id);
+                  }
+                }}
+              >
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <div className="flex flex-col md:flex-row items-center">
           <div className="overflow-hidden mx-8 mb-8 w-full">
             <div 

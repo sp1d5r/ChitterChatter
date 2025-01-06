@@ -69,6 +69,10 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         }
     };
 
+    const handleDeleteChat = (chatId: string) => {
+        FirebaseDatabaseService.deleteDocument(`chats/${authState.user?.uid}/conversations`, chatId);
+    };
+
     return <div className="w-full h-full dark:text-white flex flex-col gap-2">
         <h1 className='text-4xl font-bold '>Your Conversations</h1>
         <p>Check out your conversations here. You can also create a new conversation by clicking the button below.</p>
@@ -77,7 +81,7 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         
         <div className="flex gap-2 flex-wrap">
             {chats.map((chat) => (
-                <ChatCarousel key={chat.id} chat={chat} />
+                <ChatCarousel key={chat.id} chat={chat} onDelete={handleDeleteChat} />
             ))}
         </div>
     </div>
