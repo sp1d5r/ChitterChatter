@@ -330,6 +330,17 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                                     <span className="text-sm text-muted-foreground">Analyze group or individual chats with friends</span>
                                 </div>
                             </Button>
+
+                            <Button 
+                                variant={chatData.conversationType === 'family' ? 'default' : 'outline'}
+                                className="h-auto p-4 justify-start"
+                                onClick={() => handleTypeSelect('family')}
+                            >
+                                <div className="flex flex-col items-start">
+                                    <span className="font-semibold">Family</span>
+                                    <span className="text-sm text-muted-foreground">Analyze group or individual chats with family members</span>
+                                </div>
+                            </Button>
                         </div>
                     )}
 
