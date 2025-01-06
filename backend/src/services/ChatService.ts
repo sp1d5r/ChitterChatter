@@ -157,23 +157,26 @@ export class ChatService {
             const trimmedContent = this.trimChatContent(chatData.chatContent);
             
             // Split analysis into separate focused functions
-            const [memberAnalysis, superlatives, groupVibe, memorableMoments] = await Promise.all([
+            await Promise.all([
                 this.analyzeMemberBehaviors(userId, chatId, trimmedContent, chatData.members),
                 this.analyzeSuperlatives(userId, chatId, trimmedContent, chatData.members),
-                this.analyzeGroupVibe(trimmedContent),
+                this.analyzeGroupVibe(trimmedContent, userId, chatId),
                 this.analyzeMemorableMoments(trimmedContent)
             ]);
 
-            const analysis = {
-                memberAnalysis,
-                superlatives,
-                groupVibe,
-                memorableMoments
-            };
-
-            await this.storeAnalysisResults(userId, chatId, analysis);
         } catch (error) {
-            await this.handleAnalysisError(userId, chatId, error);
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    overallAnalysis: {
+                        status: 'failed',
+                        error: (error as Error).message
+                    }
+                },
+                undefined,
+                (error) => console.error('Failed to update analysis error status:', error)
+            );
         }
     }
 
@@ -277,28 +280,110 @@ export class ChatService {
         }
     }
 
-    private async analyzeGroupVibe(content: string) {
+    private async analyzeGroupVibe(content: string, userId: string, chatId: string) {
         const systemPrompt = `
-            You're a chat group personality analyst with a sense of humor! Analyze this group's 
-            collective vibe and quirks. Don't focus on numbers or statistics - instead, capture 
-            the essence of how this group interacts.
+            You are a professional chat group anthropologist with a PhD in Vibeology! Your mission is to 
+            analyze this group's collective personality and document their unique social ecosystem.
 
-            Look for:
-            - The group's "personality type" (be creative and funny)
-            - Weird traditions that have formed
-            - Collective quirks and habits
-            - Inside jokes and references
-            - How chaos manifests in this group
+            Evaluate the following with humor and insight:
 
-            Keep it light, fun, and focused on the unique dynamics that make this group special.
-            Return only the JSON, no additional text.
-        `;
+            1. Chaos Level (0-10):
+               - How often do conversations go completely off the rails?
+               - Does the group thrive in chaos or maintain order?
+               - What kinds of chaos are most common? (Example: "3AM philosophical debates about cereal")
+               - Provide a witty description of the chaos level
 
-        return await this.claudeService.query(
-            [{ role: "user", content: [{ type: "text", text: content }] }],
-            GroupVibeSchema,
-            systemPrompt
-        );
+            2. Group Personality Type:
+               - Create a creative D&D-style alignment (e.g., "Chaotic Supportive")
+               - Add funny modifiers (e.g., "with a side of meme addiction")
+               - Consider their collective energy (e.g., "Extremely Online Energy")
+               - Make it specific to observed behavior
+
+            3. Group Traditions:
+               - Document their weird but endearing habits
+               - Note any accidental rituals that have formed
+               - Identify unique greeting/farewell patterns
+               - Spot recurring events or themes
+               - Look for unusual timing patterns
+
+            4. Collective Quirks:
+               - Group-wide obsessions
+               - Shared vocabulary or inside references
+               - Common derailment patterns
+               - Unique reaction patterns
+               - Special group superpowers
+
+            You MUST return your analysis in this EXACT JSON format (no additional text):
+            {
+                "chaosLevel": {
+                    "rating": number (0-10),
+                    "description": "string"
+                },
+                "personalityType": "string",
+                "groupTraditions": string[],
+                "collectiveQuirks": string[]
+            }`;
+
+        try {
+            const analysis = await this.claudeService.query(
+                [{
+                    role: "user",
+                    content: [{
+                        type: "text",
+                        text: `${content} \n\n Please analyze this chat history and determine the group's collective vibe. 
+                        Return results in this exact JSON format:
+                        {
+                            "chaosLevel": {
+                                "rating": number (0-10),
+                                "description": "string"
+                            },
+                            "personalityType": "string",
+                            "groupTraditions": ["tradition1", "tradition2"],
+                            "collectiveQuirks": ["quirk1", "quirk2"]
+                        }
+                        Return only the JSON object itself, as this will be used for further parsing.`
+                    }]
+                }],
+                GroupVibeSchema,
+                systemPrompt
+            );
+
+            // Update the chat metadata with group vibe results
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    groupVibe: {
+                        results: analysis,
+                        analyzedAt: new Date(),
+                        status: 'completed'
+                    }
+                },
+                () => {
+                    console.log('Group vibe analysis stored successfully');
+                },
+                (error) => {
+                    console.error('Failed to store group vibe analysis:', error);
+                }
+            );
+
+            return analysis;
+
+        } catch (error) {
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    groupVibe: {
+                        status: 'failed',
+                        error: (error as Error).message
+                    }
+                },
+                undefined,
+                (error) => console.error('Failed to update group vibe error status:', error)
+            );
+            throw error;
+        }
     }
 
     private async analyzeMemorableMoments(content: string) {
