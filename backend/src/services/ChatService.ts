@@ -229,5 +229,110 @@ export class ChatService {
         );
     }
 
-    // ... implement other analysis functions with similar fun, qualitative approaches ...
+    private async analyzeMemorableMoments(content: string) {
+        const systemPrompt = `
+            You're a chat group's historian and keeper of legendary moments! Your job is to 
+            identify and document the most entertaining, memorable, or absurd moments from 
+            this chat history.
+
+            Look for:
+            - Epic Discussions: Those wild conversations that started about one thing and 
+              ended up somewhere completely different
+            - Running Jokes: The inside jokes that keep evolving and coming back
+            - Legendary Misunderstandings: Those beautiful moments where wires got crossed 
+              in the most entertaining ways
+
+            Examples:
+            - Epic Discussion: "The Great Pizza Debate that somehow turned into a 3-hour 
+              philosophical discussion about whether hotdogs are sandwiches"
+            - Running Joke: "The time someone typo'd 'hello' as 'hewwo' and now everyone 
+              talks like that when they're being dramatic"
+            - Legendary Misunderstanding: "When Alice thought Bob was talking about his cat 
+              for 20 messages but Bob was actually talking about his new car"
+
+            Focus on the funny and absurd! Return only the JSON, no additional text.
+        `;
+
+        return await this.claudeService.query(
+            [{ role: "user", content: [{ type: "text", text: content }] }],
+            MemorableGroupMomentsSchema,
+            systemPrompt
+        );
+    }
+
+    private async analyzeMemberBehaviors(content: string, members: string[]) {
+        const systemPrompt = `
+            You're a comedy-focused chat analyst looking for the funny quirks and patterns 
+            of each chat member! Think of yourself as a friendly roast master who points 
+            out everyone's endearing quirks.
+
+            For each member, look for:
+            - Hilarious "red flags" like:
+              * Uses way too many emojis in a row 😂🤣😂🤣😂
+              * Sends voice messages at 3 AM
+              * Responds to serious questions with memes
+              * Types everything in ALL CAPS
+            
+            - Funny patterns like:
+              * Always manages to relate any topic back to their pet
+              * Has a catchphrase they overuse
+              * Sends the same reaction GIF to everything
+              * Takes 5 business days to respond, then sends 20 messages in a row
+
+            - Memorable quirks like:
+              * Never uses punctuation but somehow uses perfect grammar
+              * Autocorrect always changes the same word and they never fix it
+              * Types "haha" with a different number of "ha"s each time
+
+            Keep it light and playful! We're celebrating the weird and wonderful things 
+            that make each person unique in the chat.
+
+            Return only the JSON, no additional text.
+        `;
+
+        return await this.claudeService.query(
+            [{ role: "user", content: [{ type: "text", text: content }] }],
+            z.array(MemberAnalysisSchema),
+            systemPrompt
+        );
+    }
+
+    private async storeAnalysisResults(
+        userId: string, 
+        chatId: string, 
+        analysis: z.infer<typeof CompleteChatAnalysisSchema>
+    ) {
+        try {
+            await FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations/${chatId}`,
+                {
+                    analysis,
+                    status: 'completed',
+                    updatedAt: new Date()
+                }
+            );
+        } catch (error) {
+            console.error('Failed to store analysis results:', error);
+            throw error;
+        }
+    }
+
+    private async handleAnalysisError(userId: string, chatId: string, error: any) {
+        console.error('Analysis failed:', error);
+        
+        try {
+            await FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations/${chatId}`,
+                {
+                    status: 'failed',
+                    error: error.message,
+                    updatedAt: new Date()
+                }
+            );
+        } catch (storeError) {
+            console.error('Failed to store error state:', storeError);
+        }
+        
+        throw error;
+    }
 }
