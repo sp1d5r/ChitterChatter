@@ -159,7 +159,7 @@ export class ChatService {
             // Split analysis into separate focused functions
             const [memberAnalysis, superlatives, groupVibe, memorableMoments] = await Promise.all([
                 this.analyzeMemberBehaviors(userId, chatId, trimmedContent, chatData.members),
-                this.analyzeSuperlatives(trimmedContent, chatData.members),
+                this.analyzeSuperlatives(userId, chatId, trimmedContent, chatData.members),
                 this.analyzeGroupVibe(trimmedContent),
                 this.analyzeMemorableMoments(trimmedContent)
             ]);
@@ -177,32 +177,104 @@ export class ChatService {
         }
     }
 
-    private async analyzeSuperlatives(content: string, members: string[]) {
+    private async analyzeSuperlatives(userId:string, chatId:string, content: string, members: string[]) {
         const systemPrompt = `
-            You're a chat group's personal awards show host! Your job is to hand out funny, 
-            creative superlative awards to chat members. Think yearbook superlatives meets 
-            comedy awards show.
+            You are a hilarious chat awards show host analyzing group conversations! Your job is to hand out creative, 
+            funny superlative awards that capture the essence of each chat member's unique contributions.
 
-            Examples of awards:
-            - "Master of Derailing Conversations in the Best Way"
-            - "Honorary Professor of GIF Responses"
-            - "Champion of Reviving Dead Chats at 3 AM"
-            - "Most Likely to Turn Any Discussion into a Food Debate"
-            
-            For each award:
-            - Be specific and reference actual chat patterns
-            - Include a funny reason why they won
-            - Keep it light and playful
-            - Focus on unique behaviors and running jokes
+            For each member, look for:
+            1. Signature Moves:
+               - Their go-to conversation tactics
+               - Unique ways they derail discussions
+               - Special powers (like summoning the group at 3 AM)
 
-            Return only the JSON, no additional text.
-        `;
+            2. Notable Achievements:
+               - Most memorable chat contributions
+               - Accidental traditions they've started
+               - Special skills (like expert GIF timing)
 
-        return await this.claudeService.query(
-            [{ role: "user", content: [{ type: "text", text: content }] }],
-            ChatSuperlativesSchema,
-            systemPrompt
-        );
+            3. Award Categories to Consider:
+               - "Master of [Specific Chat Behavior]"
+               - "Honorary Professor of [Recurring Topic]"
+               - "Champion of [Unique Group Role]"
+               - "Most Likely to [Characteristic Behavior]"
+
+            Make each award:
+            - Specific to observed behavior
+            - Genuinely funny and playful
+            - Reference actual chat patterns
+            - Include a humorous explanation
+
+            You MUST return your analysis in this EXACT JSON format (no additional text):
+            {
+                "awards": [
+                    {
+                        "title": "string",
+                        "recipient": "string",
+                        "reason": "string"
+                    }
+                ]
+            }`;
+
+        try {
+            const analysis = await this.claudeService.query(
+                [{
+                    role: "user",
+                    content: [{
+                        type: "text",
+                        text: `${content} \n\n Please analyze this chat history between ${members.join(', ')} and create amusing superlative awards. Return results in this exact JSON format:
+                        {
+                            "awards": [
+                                {
+                                    "title": "string",
+                                    "recipient": "string",
+                                    "reason": "string"
+                                }
+                            ]
+                        }
+                        Return only the JSON object itself, as this will be used for further parsing.`
+                    }]
+                }],
+                ChatSuperlativesSchema,
+                systemPrompt
+            );
+
+            // Update the chat metadata with superlatives results
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    superlatives: {
+                        results: analysis,
+                        analyzedAt: new Date(),
+                        status: 'completed'
+                    }
+                },
+                () => {
+                    console.log('Superlatives analysis stored successfully');
+                },
+                (error) => {
+                    console.error('Failed to store superlatives analysis:', error);
+                }
+            );
+
+            return analysis;
+
+        } catch (error) {
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    superlatives: {
+                        status: 'failed',
+                        error: (error as Error).message
+                    }
+                },
+                undefined,
+                (error) => console.error('Failed to update superlatives error status:', error)
+            );
+            throw error;
+        }
     }
 
     private async analyzeGroupVibe(content: string) {
@@ -402,42 +474,4 @@ export class ChatService {
         }
     }
 
-    private async storeAnalysisResults(
-        userId: string, 
-        chatId: string, 
-        analysis: z.infer<typeof CompleteChatAnalysisSchema>
-    ) {
-        try {
-            await FirebaseDatabaseService.updateDocument(
-                `chats/${userId}/conversations/${chatId}`,
-                {
-                    analysis,
-                    status: 'completed',
-                    updatedAt: new Date()
-                }
-            );
-        } catch (error) {
-            console.error('Failed to store analysis results:', error);
-            throw error;
-        }
-    }
-
-    private async handleAnalysisError(userId: string, chatId: string, error: any) {
-        console.error('Analysis failed:', error);
-        
-        try {
-            await FirebaseDatabaseService.updateDocument(
-                `chats/${userId}/conversations/${chatId}`,
-                {
-                    status: 'failed',
-                    error: error.message,
-                    updatedAt: new Date()
-                }
-            );
-        } catch (storeError) {
-            console.error('Failed to store error state:', storeError);
-        }
-        
-        throw error;
-    }
 }
