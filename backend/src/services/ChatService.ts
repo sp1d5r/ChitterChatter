@@ -71,14 +71,6 @@ const MemorableGroupMomentsSchema = z.object({
     legendaryMisunderstandings: z.array(z.string()),
 });
 
-// Combined analysis type
-const CompleteChatAnalysisSchema = z.object({
-    memberAnalysis: z.array(MemberAnalysisSchema),
-    superlatives: ChatSuperlativesSchema,
-    groupVibe: GroupVibeSchema,
-    memorableMoments: MemorableGroupMomentsSchema,
-});
-
 export class ChatService {
     private claudeService: ClaudeService;
 
@@ -160,8 +152,8 @@ export class ChatService {
             await Promise.all([
                 this.analyzeMemberBehaviors(userId, chatId, trimmedContent, chatData.members),
                 this.analyzeSuperlatives(userId, chatId, trimmedContent, chatData.members),
-                this.analyzeGroupVibe(trimmedContent, userId, chatId),
-                this.analyzeMemorableMoments(trimmedContent)
+                this.analyzeGroupVibe(userId, chatId, trimmedContent),
+                this.analyzeMemorableMoments(userId, chatId, trimmedContent)
             ]);
 
         } catch (error) {
@@ -280,7 +272,7 @@ export class ChatService {
         }
     }
 
-    private async analyzeGroupVibe(content: string, userId: string, chatId: string) {
+    private async analyzeGroupVibe(userId: string, chatId: string, content: string) {
         const systemPrompt = `
             You are a professional chat group anthropologist with a PhD in Vibeology! Your mission is to 
             analyze this group's collective personality and document their unique social ecosystem.
@@ -386,35 +378,124 @@ export class ChatService {
         }
     }
 
-    private async analyzeMemorableMoments(content: string) {
+    private async analyzeMemorableMoments(userId: string, chatId: string, content: string) {
         const systemPrompt = `
-            You're a chat group's historian and keeper of legendary moments! Your job is to 
-            identify and document the most entertaining, memorable, or absurd moments from 
-            this chat history.
+            You are a legendary chat historian with an eye for the most entertaining moments! Your mission is to 
+            document the greatest hits, running jokes, and hilarious misunderstandings that make this group unique.
 
-            Look for:
-            - Epic Discussions: Those wild conversations that started about one thing and 
-              ended up somewhere completely different
-            - Running Jokes: The inside jokes that keep evolving and coming back
-            - Legendary Misunderstandings: Those beautiful moments where wires got crossed 
-              in the most entertaining ways
+            Search for and document these key elements:
 
-            Examples:
-            - Epic Discussion: "The Great Pizza Debate that somehow turned into a 3-hour 
-              philosophical discussion about whether hotdogs are sandwiches"
-            - Running Joke: "The time someone typo'd 'hello' as 'hewwo' and now everyone 
-              talks like that when they're being dramatic"
-            - Legendary Misunderstanding: "When Alice thought Bob was talking about his cat 
-              for 20 messages but Bob was actually talking about his new car"
+            1. Epic Discussions:
+               - Wild topic derailments that were pure gold
+               - Conversations that started normal but ended bizarrely
+               - Late-night philosophical debates about mundane things
+               - Heated discussions about trivial matters
+               - Times when the group collectively went down a rabbit hole
 
-            Focus on the funny and absurd! Return only the JSON, no additional text.
-        `;
+            2. Running Jokes:
+               - Inside jokes that keep evolving
+               - Recurring memes or references
+               - Catchphrases that stuck
+               - Ongoing bits that keep getting callbacks
+               - Accidental traditions that became permanent
 
-        return await this.claudeService.query(
-            [{ role: "user", content: [{ type: "text", text: content }] }],
-            MemorableGroupMomentsSchema,
-            systemPrompt
-        );
+            3. Legendary Misunderstandings:
+               - Hilarious communication fails
+               - Times when two people were having completely different conversations
+               - Autocorrect disasters that created new meanings
+               - Emoji interpretations gone wrong
+               - Messages taken hilariously out of context
+
+            Make sure each entry is:
+            - Actually funny (not just "you had to be there")
+            - Specific enough to be memorable
+            - Captures the essence of why it was entertaining
+            - References actual chat content
+            - Explains any necessary context
+
+            You MUST return your analysis in this EXACT JSON format (no additional text):
+            {
+                "epicDiscussions": [
+                    {
+                        "topic": "string",
+                        "highlight": "string"
+                    }
+                ],
+                "runningJokes": [
+                    {
+                        "joke": "string",
+                        "context": "string"
+                    }
+                ],
+                "legendaryMisunderstandings": string[]
+            }`;
+
+        try {
+            const analysis = await this.claudeService.query(
+                [{
+                    role: "user",
+                    content: [{
+                        type: "text",
+                        text: `${content} \n\n Please analyze this chat history and identify the most memorable moments. 
+                        Return results in this exact JSON format:
+                        {
+                            "epicDiscussions": [
+                                {
+                                    "topic": "string",
+                                    "highlight": "string"
+                                }
+                            ],
+                            "runningJokes": [
+                                {
+                                    "joke": "string",
+                                    "context": "string"
+                                }
+                            ],
+                            "legendaryMisunderstandings": ["misunderstanding1", "misunderstanding2"]
+                        }
+                        Return only the JSON object itself, as this will be used for further parsing.`
+                    }]
+                }],
+                MemorableGroupMomentsSchema,
+                systemPrompt
+            );
+
+            // Update the chat metadata with memorable moments results
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    memorableMoments: {
+                        results: analysis,
+                        analyzedAt: new Date(),
+                        status: 'completed'
+                    }
+                },
+                () => {
+                    console.log('Memorable moments analysis stored successfully');
+                },
+                (error) => {
+                    console.error('Failed to store memorable moments analysis:', error);
+                }
+            );
+
+            return analysis;
+
+        } catch (error) {
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    memorableMoments: {
+                        status: 'failed',
+                        error: (error as Error).message
+                    }
+                },
+                undefined,
+                (error) => console.error('Failed to update memorable moments error status:', error)
+            );
+            throw error;
+        }
     }
 
     private async analyzeMemberBehaviors(userId:string, chatId:string, content: string, members: string[]) {
