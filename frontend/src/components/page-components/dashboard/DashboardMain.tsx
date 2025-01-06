@@ -76,7 +76,7 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         <NewChatModal onFinish={handleNewChat} />
         
         <div className="flex gap-2 flex-wrap">
-            {chats.map((chat) => (
+            {chats.reverse().map((chat) => (
                 <ChatCarousel key={chat.id} chat={chat} />
             ))}
         </div>

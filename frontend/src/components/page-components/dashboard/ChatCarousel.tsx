@@ -3,10 +3,10 @@ import { Button } from "../../shadcn/button";
 import { ChatData } from 'shared';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 
 interface ChatCard {
   title: string;
-  color: string;
   content: () => React.ReactNode;
 }
 
@@ -20,84 +20,94 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat }) => {
   const cards: ChatCard[] = [
     {
       title: "Member Analysis",
-      color: "bg-blue-200 dark:bg-blue-800",
       content: () => {
         if (!chat.analysis) return <p>Analysis not started</p>;
         if (chat.analysis.status === 'failed') return <p>Error: {chat.analysis.error}</p>;
         if (chat.analysis.status === 'pending' || chat.analysis.status === 'processing') {
           return <p>Analysis in progress...</p>;
         }
+
+        // Sort members by red flag score
+        const sortedMembers = [...chat.analysis.results]
+          .filter(m => m.redFlagScore !== undefined)
+          .sort((a, b) => (b.redFlagScore ?? 0) - (a.redFlagScore ?? 0))
+          .slice(0, 3); // Top 3 members
+
         return (
-          <div className="space-y-2">
-            {chat.analysis.results.map((member) => (
-              <div key={member.memberId} className="text-sm">
-                <p>{member.memberId}</p>
-                <p>Sentiment: {member.sentimentScore?.toFixed(2) ?? 'N/A'}</p>
-                <p>Funny Score: {member.funnyScore?.toFixed(2) ?? 'N/A'}</p>
-                {member.redFlagScore && (
-                  <p>Red Flag Score: {member.redFlagScore.toFixed(2)}</p>
-                )}
-              </div>
-            ))}
+          <div className="h-full">
+            <p className="text-sm mb-2">Top Red Flags 🚩</p>
+            <ResponsiveContainer width="100%" height={120}>
+              <BarChart data={sortedMembers}>
+                <XAxis dataKey="memberId" />
+                <Bar dataKey="redFlagScore" fill="#ef4444">
+                  {sortedMembers.map((entry, index) => (
+                    <Cell key={index} fill={index === 0 ? '#ef4444' : '#f87171'} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         );
       }
     },
     {
       title: "Group Vibe",
-      color: "bg-green-200 dark:bg-green-800",
       content: () => {
         if (!chat.groupVibe) return <p>Analysis not started</p>;
         if (chat.groupVibe.status === 'failed') return <p>Error: {chat.groupVibe.error}</p>;
         if (chat.groupVibe.status === 'pending' || chat.groupVibe.status === 'processing') {
           return <p>Analysis in progress...</p>;
         }
+
         return (
-          <div className="space-y-2">
-            <p>Chaos Level: {chat.groupVibe.results.chaosLevel.rating}/10</p>
-            <p>Personality: {chat.groupVibe.results.personalityType}</p>
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="text-4xl mb-2">
+              {chat.groupVibe.results.chaosLevel.rating}/10
+            </div>
+            <p className="text-sm text-center">Chaos Level</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              {chat.groupVibe.results.personalityType}
+            </p>
           </div>
         );
       }
     },
     {
       title: "Memorable Moments",
-      color: "bg-purple-200 dark:bg-purple-800",
       content: () => {
         if (!chat.memorableMoments) return <p>Analysis not started</p>;
         if (chat.memorableMoments.status === 'failed') return <p>Error: {chat.memorableMoments.error}</p>;
         if (chat.memorableMoments.status === 'pending' || chat.memorableMoments.status === 'processing') {
           return <p>Analysis in progress...</p>;
         }
+
+        const topMoment = chat.memorableMoments.results.epicDiscussions[0];
         return (
-          <div className="space-y-2">
-            {chat.memorableMoments.results.epicDiscussions.slice(0, 2).map((discussion, i) => (
-              <div key={i} className="text-sm">
-                <p className="font-medium">{discussion.topic}</p>
-                <p>{discussion.highlight}</p>
-              </div>
-            ))}
+          <div className="h-full flex flex-col justify-center">
+            <p className="text-sm font-medium mb-1">Top Discussion 🔥</p>
+            <p className="text-lg mb-1">{topMoment.topic}</p>
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              {topMoment.highlight}
+            </p>
           </div>
         );
       }
     },
     {
       title: "Superlatives",
-      color: "bg-orange-200 dark:bg-orange-800",
       content: () => {
         if (!chat.superlatives) return <p>Analysis not started</p>;
         if (chat.superlatives.status === 'failed') return <p>Error: {chat.superlatives.error}</p>;
         if (chat.superlatives.status === 'pending' || chat.superlatives.status === 'processing') {
           return <p>Analysis in progress...</p>;
         }
+
+        const topAward = chat.superlatives.results.awards[0];
         return (
-          <div className="space-y-2">
-            {chat.superlatives.results.awards.slice(0, 3).map((award, i) => (
-              <div key={i} className="text-sm">
-                <p className="font-medium">{award.title}</p>
-                <p>{award.recipient}</p>
-              </div>
-            ))}
+          <div className="h-full flex flex-col justify-center">
+            <p className="text-sm font-medium mb-1">🏆 Top Award</p>
+            <p className="text-lg mb-1">{topAward.title}</p>
+            <p className="text-sm">Goes to: {topAward.recipient}</p>
           </div>
         );
       }
@@ -115,7 +125,7 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat }) => {
   useEffect(() =>{
     const timer = setInterval(() => {
       nextCard();
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [])
@@ -139,7 +149,7 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat }) => {
                 >
                   <div className="space-y-4">
                     <h3 className="font-medium">{card.title}</h3>
-                    <div className={`${card.color} w-full h-48 rounded-lg shadow-sm p-4`}>
+                    <div className="w-full h-48 rounded-lg p-4 border">
                       {card.content()}
                     </div>
                   </div>
