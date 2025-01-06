@@ -73,10 +73,8 @@ export const DashboardMain : React.FC<DashboardMainProps> = () => {
         <h1 className='text-4xl font-bold '>Your Conversations</h1>
         <p>Check out your conversations here. You can also create a new conversation by clicking the button below.</p>
 
-        <div className="flex justify-start items-center gap-2 flex-wrap lg:flex-no-wrap overflow-x-scroll my-2">
-            <NewChatModal onFinish={handleNewChat} />
-        </div>
-
+        <NewChatModal onFinish={handleNewChat} />
+        
         <div className="flex gap-2 flex-wrap">
             {chats.map((chat) => (
                 <ChatCarousel key={chat.id} chat={chat} />

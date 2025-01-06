@@ -29,7 +29,7 @@ export interface NewChatModalProps {
 }
 
 export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [chatData, setChatData] = useState<ChatData>({
     platform: null,
@@ -127,7 +127,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
         new Promise(resolve => setTimeout(resolve, stepDelay))
     ]);
     
-    setIsOpen(false);
+    setOpen(false);
     resetModalState();
     setAnimationState({ isProcessing: false, currentAnimationStep: 0 });
   };
@@ -149,10 +149,10 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
 
   return (
     <Dialog 
-      open={isOpen} 
-      onOpenChange={(open) => {
-        setIsOpen(open);
-        if (!open) {
+      open={open} 
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
           resetModalState();
         }
       }}
@@ -161,7 +161,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
         <Button 
           variant="outline" 
           className="h-auto w-full justify-start text-left max-w-[350px]"
-          onClick={() => setIsOpen(true)}
+          onClick={() => setOpen(true)}
         >
           <div className="flex items-center">
             <div className="mr-3 text-2xl"><Plus /></div>
