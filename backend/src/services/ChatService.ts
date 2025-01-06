@@ -35,6 +35,8 @@ const MemberAnalysisSchema = z.object({
   quirks: z.array(z.string()),
   funnyScore: z.number().min(0).max(10),
   funnyMoments: z.array(z.string()),
+  cringeScore: z.number().min(0).max(10),
+  cringeMoments: z.array(z.string()),
 });
 
 const ChatAnalysisSchema = z.array(MemberAnalysisSchema);
@@ -153,6 +155,17 @@ export class ChatService {
                - Capture their best unintentionally hilarious moments
                - Note any running jokes they've started
                - Record their most memorable quotes
+            
+            8. Cringe Score (0-10):
+               - How cringe-worthy are they?
+               - Are they the group's designated cringe master?
+               - Do they always send embarrassing photos?
+               - Give funny reasons for any scores (the more ridiculous the better!)
+            
+            9. Cringe Moments:
+               - Capture their most cringe-worthy moments
+               - Note any running jokes they've started
+               - Record their most memorable quotes
 
             Remember: Keep it light and fun! We're looking for endearing quirks and amusing patterns, not serious issues.
             
@@ -167,7 +180,9 @@ export class ChatService {
                     "topicAnalysis": [{"topic": "string", "frequency": number}],
                     "quirks": ["types 'hehe' after everything hehe", "sends good morning texts at midnight"],
                     "funnyScore": number,
-                    "funnyMoments": ["that time they tried to explain NFTs to grandma"]
+                    "funnyMoments": ["that time they tried to explain NFTs to grandma"],
+                    "cringeScore": number,
+                    "cringeMoments": ["that time they sent a photo of their cat in a box"]
                 }
             ]
         `;
@@ -188,7 +203,12 @@ export class ChatService {
                     "sentimentScore": number,
                     "topicAnalysis": [
                         {"topic": "string", "frequency": number}
-                    ]
+                    ],
+                    "quirks": ["types 'hehe' after everything hehe", "sends good morning texts at midnight"],
+                    "funnyScore": number,
+                    "funnyMoments": ["that time they tried to explain NFTs to grandma"],
+                    "cringeScore": number,
+                    "cringeMoments": ["that time they sent a photo of their cat in a box"]
                 }
             ]
                   return an array of JSON objects with in the correct format and types. Just return the object itself, as this will be used for further parsing. 
