@@ -158,7 +158,7 @@ export class ChatService {
             
             // Split analysis into separate focused functions
             const [memberAnalysis, superlatives, groupVibe, memorableMoments] = await Promise.all([
-                this.analyzeMemberBehaviors(trimmedContent, chatData.members),
+                this.analyzeMemberBehaviors(userId, chatId, trimmedContent, chatData.members),
                 this.analyzeSuperlatives(trimmedContent, chatData.members),
                 this.analyzeGroupVibe(trimmedContent),
                 this.analyzeMemorableMoments(trimmedContent)
@@ -260,41 +260,146 @@ export class ChatService {
         );
     }
 
-    private async analyzeMemberBehaviors(content: string, members: string[]) {
+    private async analyzeMemberBehaviors(userId:string, chatId:string, content: string, members: string[]) {
         const systemPrompt = `
-            You're a comedy-focused chat analyst looking for the funny quirks and patterns 
-            of each chat member! Think of yourself as a friendly roast master who points 
-            out everyone's endearing quirks.
+            You are a witty chat analyzer with a great sense of humor! Your job is to find the funny quirks and entertaining patterns in chat conversations. Think of yourself as a comedy detective looking for amusing behavioral patterns.
+        
+        For each participant, evaluate with a fun twist:
+        1. Red Flag Score (0-10):
+           - Look for hilarious dating red flags like "uses too many emojis 🤪"
+           - Spot people who say "literally" literally too much
+           - Notice if they're weirdly obsessed with their cat
+           - Give funny reasons for any scores (the more ridiculous the better!)
+        
+        2. Toxicity Score (0-10):
+           - More about sass levels than actual toxicity
+           - Are they the group's designated drama queen?
+           - Do they use passive-aggressive "k" responses?
+        
+        3. Sentiment Score (-1 to 1):
+           - Are they the group's eternal optimist or resident grump?
+           - Do they respond to everything with memes?
+        
+        4. Topic Analysis:
+           - What random topics do they always circle back to?
+           - Do they somehow always bring up their ex?
+           - Track their weird obsessions
+        
+        5. Quirks:
+           - List their funny chat habits
+           - Do they always type in ALL CAPS?
+           - Never use punctuation?
+           - Send voice messages at 3 AM?
+        
+        6. Funny Score (0-10):
+           - How intentionally (or unintentionally) funny are they?
+           - Are they the group's comedian or comic relief?
+        
+        7. Funny Moments:
+           - Capture their best unintentionally hilarious moments
+           - Note any running jokes they've started
+           - Record their most memorable quotes
+        
+        8. Cringe Score (0-10):
+           - How cringe-worthy are they?
+           - Are they the group's designated cringe master?
+           - Do they always send embarrassing photos?
+           - Give funny reasons for any scores (the more ridiculous the better!)
+        
+        9. Cringe Moments:
+           - Capture their most cringe-worthy moments
+           - Note any running jokes they've started
+           - Record their most memorable quotes
 
-            For each member, look for:
-            - Hilarious "red flags" like:
-              * Uses way too many emojis in a row 😂🤣😂🤣😂
-              * Sends voice messages at 3 AM
-              * Responds to serious questions with memes
-              * Types everything in ALL CAPS
-            
-            - Funny patterns like:
-              * Always manages to relate any topic back to their pet
-              * Has a catchphrase they overuse
-              * Sends the same reaction GIF to everything
-              * Takes 5 business days to respond, then sends 20 messages in a row
+        You MUST return your analysis in this EXACT JSON format (no additional text):
+        [
+            {
+                "memberId": "string",
+                "redFlagScore": number (0-10),
+                "redFlagReasons": string[],
+                "toxicityScore": number (0-10),
+                "sentimentScore": number (-1 to 1),
+                "topicAnalysis": [
+                    {
+                        "topic": "string",
+                        "frequency": number
+                    }
+                ],
+                "quirks": string[],
+                "funnyScore": number (0-10),
+                "funnyMoments": string[],
+                "cringeScore": number (0-10),
+                "cringeMoments": string[]
+            }
+        ]`;
 
-            - Memorable quirks like:
-              * Never uses punctuation but somehow uses perfect grammar
-              * Autocorrect always changes the same word and they never fix it
-              * Types "haha" with a different number of "ha"s each time
+        try {
+            const analysis = await this.claudeService.query(
+                [{
+                    role: "user",
+                    content: [{
+                        type: "text",
+                        text: `${content} \n\n. Please perform a comprehensive analysis of this chat history between ${members.join(', ')}. You are to return  Return results in this JSON format:
+            [
+                {
+                    "memberId": "string",
+                    "redFlagScore": number,
+                    "redFlagReasons": ["reason1", "reason2"],
+                    "toxicityScore": number,
+                    "sentimentScore": number,
+                    "topicAnalysis": [
+                        {"topic": "string", "frequency": number}
+                    ]
+                "quirks": string[],
+                "funnyScore": number (0-10),
+                "funnyMoments": string[],
+                "cringeScore": number (0-10),
+                "cringeMoments": string[]
+                }
+            ]
+                  return an array of JSON objects with in the correct format and types. Just return the object itself, as this will be used for further parsing. 
+            `
+                    }]
+                }],
+                MemberAnalysisSchema,
+                systemPrompt
+            );
 
-            Keep it light and playful! We're celebrating the weird and wonderful things 
-            that make each person unique in the chat.
+            // Update the chat metadata with analysis results using your Firebase service
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    analysis: {
+                        results: analysis,
+                        analyzedAt: new Date(),
+                        status: 'completed'
+                    }
+                },
+                () => {
+                    // Success callback
+                    console.log('Analysis stored successfully');
+                },
+                (error) => {
+                    // Error callback
+                    console.error('Failed to store analysis:', error);
+                }
+            );
 
-            Return only the JSON, no additional text.
-        `;
-
-        return await this.claudeService.query(
-            [{ role: "user", content: [{ type: "text", text: content }] }],
-            z.array(MemberAnalysisSchema),
-            systemPrompt
-        );
+        } catch (error) {
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations`,
+                chatId,
+                {
+                    analysis: {
+                        status: 'failed',
+                        error: (error as Error).message
+                    }
+                },
+                undefined,
+                (error) => console.error('Failed to update error status:', error)
+            );
+        }
     }
 
     private async storeAnalysisResults(
