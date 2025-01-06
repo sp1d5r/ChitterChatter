@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 interface ChatCard {
   title: string;
   color: string;
+  content: () => React.ReactNode;
 }
 
 export interface ChatCarouselProps {  
@@ -17,10 +18,90 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat }) => {
   const [activeCard, setActiveCard] = useState(0);
   
   const cards: ChatCard[] = [
-    { title: "Recent Activity", color: "bg-blue-200 dark:bg-blue-800" },
-    { title: "Weekly Stats", color: "bg-green-200 dark:bg-green-800" },
-    { title: "Monthly Overview", color: "bg-purple-200 dark:bg-purple-800" },
-    { title: "Performance", color: "bg-orange-200 dark:bg-orange-800" },
+    {
+      title: "Member Analysis",
+      color: "bg-blue-200 dark:bg-blue-800",
+      content: () => {
+        if (!chat.analysis) return <p>Analysis not started</p>;
+        if (chat.analysis.status === 'failed') return <p>Error: {chat.analysis.error}</p>;
+        if (chat.analysis.status === 'pending' || chat.analysis.status === 'processing') {
+          return <p>Analysis in progress...</p>;
+        }
+        return (
+          <div className="space-y-2">
+            {chat.analysis.results.map((member) => (
+              <div key={member.memberId} className="text-sm">
+                <p>{member.memberId}</p>
+                <p>Sentiment: {member.sentimentScore?.toFixed(2) ?? 'N/A'}</p>
+                <p>Funny Score: {member.funnyScore?.toFixed(2) ?? 'N/A'}</p>
+                {member.redFlagScore && (
+                  <p>Red Flag Score: {member.redFlagScore.toFixed(2)}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      }
+    },
+    {
+      title: "Group Vibe",
+      color: "bg-green-200 dark:bg-green-800",
+      content: () => {
+        if (!chat.groupVibe) return <p>Analysis not started</p>;
+        if (chat.groupVibe.status === 'failed') return <p>Error: {chat.groupVibe.error}</p>;
+        if (chat.groupVibe.status === 'pending' || chat.groupVibe.status === 'processing') {
+          return <p>Analysis in progress...</p>;
+        }
+        return (
+          <div className="space-y-2">
+            <p>Chaos Level: {chat.groupVibe.results.chaosLevel.rating}/10</p>
+            <p>Personality: {chat.groupVibe.results.personalityType}</p>
+          </div>
+        );
+      }
+    },
+    {
+      title: "Memorable Moments",
+      color: "bg-purple-200 dark:bg-purple-800",
+      content: () => {
+        if (!chat.memorableMoments) return <p>Analysis not started</p>;
+        if (chat.memorableMoments.status === 'failed') return <p>Error: {chat.memorableMoments.error}</p>;
+        if (chat.memorableMoments.status === 'pending' || chat.memorableMoments.status === 'processing') {
+          return <p>Analysis in progress...</p>;
+        }
+        return (
+          <div className="space-y-2">
+            {chat.memorableMoments.results.epicDiscussions.slice(0, 2).map((discussion, i) => (
+              <div key={i} className="text-sm">
+                <p className="font-medium">{discussion.topic}</p>
+                <p>{discussion.highlight}</p>
+              </div>
+            ))}
+          </div>
+        );
+      }
+    },
+    {
+      title: "Superlatives",
+      color: "bg-orange-200 dark:bg-orange-800",
+      content: () => {
+        if (!chat.superlatives) return <p>Analysis not started</p>;
+        if (chat.superlatives.status === 'failed') return <p>Error: {chat.superlatives.error}</p>;
+        if (chat.superlatives.status === 'pending' || chat.superlatives.status === 'processing') {
+          return <p>Analysis in progress...</p>;
+        }
+        return (
+          <div className="space-y-2">
+            {chat.superlatives.results.awards.slice(0, 3).map((award, i) => (
+              <div key={i} className="text-sm">
+                <p className="font-medium">{award.title}</p>
+                <p>{award.recipient}</p>
+              </div>
+            ))}
+          </div>
+        );
+      }
+    },
   ];
 
   const nextCard = () => {
@@ -58,7 +139,9 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat }) => {
                 >
                   <div className="space-y-4">
                     <h3 className="font-medium">{card.title}</h3>
-                    <div className={`${card.color} w-full h-48 rounded-lg shadow-sm`} />
+                    <div className={`${card.color} w-full h-48 rounded-lg shadow-sm p-4`}>
+                      {card.content()}
+                    </div>
                   </div>
                 </motion.div>
               ))}
