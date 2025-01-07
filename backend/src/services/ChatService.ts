@@ -21,8 +21,8 @@ interface StoredChatMetadata {
     // Add any other metadata you want to track
 }
 
-// Individual member analysis (existing)
-const MemberAnalysisSchema = z.object({
+// Split the schemas into two parts
+const MemberBasicAnalysisSchema = z.object({
   memberId: z.string(),
   redFlagScore: z.number().min(0).max(10),
   redFlagReasons: z.array(z.string()),
@@ -32,6 +32,10 @@ const MemberAnalysisSchema = z.object({
     topic: z.string(),
     frequency: z.number(),
   })),
+});
+
+const MemberPersonalityAnalysisSchema = z.object({
+  memberId: z.string(),
   quirks: z.array(z.string()),
   funnyScore: z.number().min(0).max(10),
   funnyMoments: z.array(z.string()),
@@ -39,8 +43,9 @@ const MemberAnalysisSchema = z.object({
   cringeMoments: z.array(z.string()),
 });
 
-// Create an array schema for member analyses
-const MemberAnalysesSchema = z.array(MemberAnalysisSchema);
+// Create array schemas for both
+const MemberBasicAnalysesSchema = z.array(MemberBasicAnalysisSchema);
+const MemberPersonalityAnalysesSchema = z.array(MemberPersonalityAnalysisSchema);
 
 // New fun, qualitative schemas
 const ChatSuperlativesSchema = z.object({
@@ -501,133 +506,36 @@ export class ChatService {
         }
     }
 
-    private async analyzeMemberBehaviors(userId:string, chatId:string, content: string, members: string[]) {
-        const systemPrompt = `
-            You are a witty chat analyzer with a great sense of humor! Your job is to find the funny quirks and entertaining patterns in chat conversations. Think of yourself as a comedy detective looking for amusing behavioral patterns.
-        
-        For each participant, evaluate with a fun twist:
-        1. Red Flag Score (0-10):
-           - Look for hilarious dating red flags like "uses too many emojis 🤪"
-           - Spot people who say "literally" literally too much
-           - Notice if they're weirdly obsessed with their cat
-           - Give funny reasons for any scores (the more ridiculous the better!)
-        
-        2. Toxicity Score (0-10):
-           - More about sass levels than actual toxicity
-           - Are they the group's designated drama queen?
-           - Do they use passive-aggressive "k" responses?
-        
-        3. Sentiment Score (-1 to 1):
-           - Are they the group's eternal optimist or resident grump?
-           - Do they respond to everything with memes?
-        
-        4. Topic Analysis:
-           - What random topics do they always circle back to?
-           - Do they somehow always bring up their ex?
-           - Track their weird obsessions
-        
-        5. Quirks:
-           - List their funny chat habits
-           - Do they always type in ALL CAPS?
-           - Never use punctuation?
-           - Send voice messages at 3 AM?
-        
-        6. Funny Score (0-10):
-           - How intentionally (or unintentionally) funny are they?
-           - Are they the group's comedian or comic relief?
-        
-        7. Funny Moments:
-           - Capture their best unintentionally hilarious moments
-           - Note any running jokes they've started
-           - Record their most memorable quotes
-        
-        8. Cringe Score (0-10):
-           - How cringe-worthy are they?
-           - Are they the group's designated cringe master?
-           - Do they always send embarrassing photos?
-           - Give funny reasons for any scores (the more ridiculous the better!)
-        
-        9. Cringe Moments:
-           - Capture their most cringe-worthy moments
-           - Note any running jokes they've started
-           - Record their most memorable quotes
-
-        You MUST return your analysis in this EXACT JSON format (no additional text):
-        [
-            {
-                "memberId": "string",
-                "redFlagScore": number (0-10),
-                "redFlagReasons": string[],
-                "toxicityScore": number (0-10),
-                "sentimentScore": number (-1 to 1),
-                "topicAnalysis": [
-                    {
-                        "topic": "string",
-                        "frequency": number
-                    }
-                ],
-                "quirks": string[],
-                "funnyScore": number (0-10),
-                "funnyMoments": string[],
-                "cringeScore": number (0-10),
-                "cringeMoments": string[]
-            }
-        ]`;
-
+    private async analyzeMemberBehaviors(userId: string, chatId: string, content: string, members: string[]) {
         try {
-            const analysis = await this.claudeService.query(
-                [{
-                    role: "user",
-                    content: [{
-                        type: "text",
-                        text: `${content} \n\n Please analyze this chat history between ${members.join(', ')}. Return results in this JSON format:
-                        [
-                            {
-                                "memberId": "string",
-                                "redFlagScore": number,
-                                "redFlagReasons": ["reason1", "reason2"],
-                                "toxicityScore": number,
-                                "sentimentScore": number,
-                                "topicAnalysis": [
-                                    {"topic": "string", "frequency": number}
-                                ],
-                                "quirks": string[],
-                                "funnyScore": number,
-                                "funnyMoments": string[],
-                                "cringeScore": number,
-                                "cringeMoments": string[]
-                            }
-                        ]
-                        Return only the array itself, as this will be used for further parsing.`
-                    }]
-                }],
-                MemberAnalysesSchema,
-                systemPrompt
-            );
+            // First analysis: Basic metrics
+            const basicAnalysis = await this.analyzeMemberBasicMetrics(content, members);
+            
+            // Second analysis: Personality traits
+            const personalityAnalysis = await this.analyzeMemberPersonality(content, members);
 
-            // Update the chat metadata with analysis results using your Firebase service
-            FirebaseDatabaseService.updateDocument(
+            // Merge results for each member
+            const combinedAnalysis = members.map(memberId => {
+                const basic = basicAnalysis.find(b => b.memberId === memberId) || {};
+                const personality = personalityAnalysis.find(p => p.memberId === memberId) || {};
+                return { ...basic, ...personality };
+            });
+
+            // Update Firebase
+            await FirebaseDatabaseService.updateDocument(
                 `chats/${userId}/conversations`,
                 chatId,
                 {
                     analysis: {
-                        results: analysis,
+                        results: combinedAnalysis,
                         analyzedAt: new Date(),
                         status: 'completed'
                     }
-                },
-                () => {
-                    // Success callback
-                    console.log('Analysis stored successfully');
-                },
-                (error) => {
-                    // Error callback
-                    console.error('Failed to store analysis:', error);
                 }
             );
 
         } catch (error) {
-            FirebaseDatabaseService.updateDocument(
+            await FirebaseDatabaseService.updateDocument(
                 `chats/${userId}/conversations`,
                 chatId,
                 {
@@ -635,11 +543,104 @@ export class ChatService {
                         status: 'failed',
                         error: (error as Error).message
                     }
-                },
-                undefined,
-                (error) => console.error('Failed to update error status:', error)
+                }
             );
         }
+    }
+
+    private async analyzeMemberBasicMetrics(content: string, members: string[]) {
+        const systemPrompt = `
+            You are analyzing chat participants' basic metrics. For each member, evaluate:
+            
+            1. Red Flag Score (0-10):
+               - Look for hilarious dating red flags
+               - Give funny reasons for scores
+            
+            2. Toxicity Score (0-10):
+               - More about sass levels than actual toxicity
+            
+            3. Sentiment Score (-1 to 1):
+               - Are they the group's optimist or resident grump?
+            
+            4. Topic Analysis:
+               - What topics do they frequently discuss?
+               - Track their recurring themes
+
+            You MUST return your analysis in this EXACT JSON format (no additional text):
+            [
+                {
+                    "memberId": "string",
+                    "redFlagScore": number,
+                    "redFlagReasons": ["reason1", "reason2"],
+                    "toxicityScore": number,
+                    "sentimentScore": number,
+                    "topicAnalysis": [
+                        {
+                            "topic": "string",
+                            "frequency": number
+                        }
+                    ]
+                }
+            ]`;
+
+        return await this.claudeService.query(
+            [{
+                role: "user",
+                content: [{
+                    type: "text",
+                    text: `${content}\n\nAnalyze these members: ${members.join(', ')}. Return results in this exact JSON format:
+                    [
+                        {
+                            "memberId": "string",
+                            "redFlagScore": number,
+                            "redFlagReasons": ["reason1", "reason2"],
+                            "toxicityScore": number,
+                            "sentimentScore": number,
+                            "topicAnalysis": [
+                                {
+                                    "topic": "string",
+                                    "frequency": number
+                                }
+                            ]
+                        }
+                    ]
+                    Return only the JSON array itself, as this will be used for further parsing.`
+                }]
+            }],
+            MemberBasicAnalysesSchema,
+            systemPrompt
+        );
+    }
+
+    private async analyzeMemberPersonality(content: string, members: string[]) {
+        const systemPrompt = `
+            You are analyzing chat participants' personality traits. For each member, evaluate:
+            
+            1. Quirks:
+               - List their funny chat habits
+               - Note their unique behaviors
+            
+            2. Funny Score (0-10) and Moments:
+               - How intentionally or unintentionally funny are they?
+               - Capture their best hilarious moments
+            
+            3. Cringe Score (0-10) and Moments:
+               - Rate and document their most cringe-worthy moments
+               - Note any memorable awkward situations
+
+            Return ONLY an array of member analyses in valid JSON format.`;
+
+        return await this.claudeService.query(
+            [{
+                role: "user",
+                content: [{
+                    type: "text",
+                    text: `${content}\n\nAnalyze these members: ${members.join(', ')}`
+                }]
+            }],
+            MemberPersonalityAnalysesSchema,
+            systemPrompt
+        );
     }
 
 }
