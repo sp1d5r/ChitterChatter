@@ -54,9 +54,9 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
             <ResponsiveContainer width="100%" height={120}>
               <BarChart data={sortedMembers}>
                 <XAxis dataKey="memberId" />
-                <Bar dataKey="redFlagScore" fill="#ef4444">
+                <Bar dataKey="redFlagScore" fill="#dc2626">
                   {sortedMembers.map((entry, index) => (
-                    <Cell key={index} fill={index === 0 ? '#ef4444' : '#f87171'} />
+                    <Cell key={index} fill={index === 0 ? '#dc2626' : '#ef4444'} />
                   ))}
                 </Bar>
               </BarChart>
