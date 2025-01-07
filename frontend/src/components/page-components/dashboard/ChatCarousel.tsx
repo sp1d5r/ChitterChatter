@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from "../../shadcn/button";
 import { ChatData } from 'shared';
-import { ChevronLeft, ChevronRight, Trash2, AlertCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Trash2, AlertCircle, Maximize2, ExternalLink } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, ResponsiveContainer, Cell } from 'recharts';
 import {
@@ -160,6 +160,15 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
     return () => clearInterval(timer);
   }, [])
 
+  const ExpandedCardContent: React.FC<{ card: ChatCard }> = ({ card }) => {
+    return (
+      <div className="min-h-[400px]">
+        <h2 className="text-3xl font-bold mb-6">{card.title}</h2>
+        {card.content()}
+      </div>
+    );
+  };
+
   return (
     <div className="w-full max-w-4xl relative">
       <div className="relative rounded-lg border p-6">
@@ -220,7 +229,16 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
                   transition={{ duration: 0.5 }}
                 >
                   <div className="space-y-4">
-                    <h3 className="font-bold text-2xl">{card.title}</h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-bold text-2xl">{card.title}</h3>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => {if (chat.id) {window.location.href = `/chat/${chat.id}`;}}}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <div className="w-full h-48 rounded-lg">
                       {card.content()}
                     </div>
