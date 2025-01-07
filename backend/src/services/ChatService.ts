@@ -127,8 +127,8 @@ export class ChatService {
         return chatMetadata;
     }
 
-    private trimChatContent(content: string, maxTokens = 30000): string {
-        // Split by message boundaries (assuming they're separated by newlines)
+    private trimChatContent(content: string, maxTokens = 30000, maxLineLength = 500): string {
+        // Split by message boundaries
         const messages = content.split('\r\n');
         
         // Start from the most recent messages
@@ -137,12 +137,19 @@ export class ChatService {
         
         // Work backwards from the most recent messages
         for (let i = messages.length - 1; i >= 0; i--) {
-            const messageSize = messages[i].length;
+            // Trim individual message if too long
+            let message = messages[i];
+            if (message.length > maxLineLength) {
+                message = message.substring(0, maxLineLength) + '...';
+            }
+            
+            const messageSize = message.length;
             if (currentSize + messageSize > maxTokens) {
                 break;
             }
+            
             currentSize += messageSize;
-            trimmedContent = messages[i] + '\r\n' + trimmedContent;
+            trimmedContent = message + '\r\n' + trimmedContent;
         }
         
         return trimmedContent.trim();
