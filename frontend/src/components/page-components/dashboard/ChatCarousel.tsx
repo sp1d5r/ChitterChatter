@@ -33,7 +33,7 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
       content: () => {
         if (!chat.analysis) return <p>Analysis not started</p>;
         if (chat.analysis.status === 'failed') return (
-          <div className="h-full flex flex-col items-center justify-center text-destructive">
+          <div className="h-full flex flex-col items-center justify-center text-red-700 dark:text-red-500">
             <AlertCircle className="h-8 w-8 mb-2" />
             <p>Sorry, analysis failed</p>
           </div>
