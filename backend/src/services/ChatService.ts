@@ -39,6 +39,9 @@ const MemberAnalysisSchema = z.object({
   cringeMoments: z.array(z.string()),
 });
 
+// Create an array schema for member analyses
+const MemberAnalysesSchema = z.array(MemberAnalysisSchema);
+
 // New fun, qualitative schemas
 const ChatSuperlativesSchema = z.object({
     awards: z.array(z.object({
@@ -577,29 +580,28 @@ export class ChatService {
                     role: "user",
                     content: [{
                         type: "text",
-                        text: `${content} \n\n. Please perform a comprehensive analysis of this chat history between ${members.join(', ')}. You are to return  Return results in this JSON format:
-            [
-                {
-                    "memberId": "string",
-                    "redFlagScore": number,
-                    "redFlagReasons": ["reason1", "reason2"],
-                    "toxicityScore": number,
-                    "sentimentScore": number,
-                    "topicAnalysis": [
-                        {"topic": "string", "frequency": number}
-                    ]
-                "quirks": string[],
-                "funnyScore": number (0-10),
-                "funnyMoments": string[],
-                "cringeScore": number (0-10),
-                "cringeMoments": string[]
-                }
-            ]
-                  return an array of JSON objects with in the correct format and types. Just return the object itself, as this will be used for further parsing. 
-            `
+                        text: `${content} \n\n Please analyze this chat history between ${members.join(', ')}. Return results in this JSON format:
+                        [
+                            {
+                                "memberId": "string",
+                                "redFlagScore": number,
+                                "redFlagReasons": ["reason1", "reason2"],
+                                "toxicityScore": number,
+                                "sentimentScore": number,
+                                "topicAnalysis": [
+                                    {"topic": "string", "frequency": number}
+                                ],
+                                "quirks": string[],
+                                "funnyScore": number,
+                                "funnyMoments": string[],
+                                "cringeScore": number,
+                                "cringeMoments": string[]
+                            }
+                        ]
+                        Return only the array itself, as this will be used for further parsing.`
                     }]
                 }],
-                MemberAnalysisSchema,
+                MemberAnalysesSchema,
                 systemPrompt
             );
 
