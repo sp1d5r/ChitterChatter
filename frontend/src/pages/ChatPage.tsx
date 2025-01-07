@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthenticationProvider';
 import { FirebaseDatabaseService } from 'shared';
 import { ChatData } from 'shared/src/types/Chat';
@@ -8,6 +8,9 @@ export const ChatPage = () => {
   const { chatId } = useParams();
   const { authState } = useAuth();
   const [chat, setChat] = useState<ChatData | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isShared = location.search.includes('shared=true');
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
@@ -37,20 +40,18 @@ export const ChatPage = () => {
   }, [authState.user, chatId]);
   
   const handleShare = useCallback(async () => {
+    const shareUrl = `${window.location.href}${window.location.search ? '&' : '?'}shared=true`;
     const shareData = {
       title: `${chat?.conversationType || 'Chat'} Wrapped`,
       text: `Check out our ${chat?.conversationType || 'chat'} analysis! ${chat?.messageCount || 0} messages of pure chaos 😂`,
-      url: window.location.href
+      url: shareUrl
     };
 
     try {
       if (navigator.share) {
-        // Use native share on mobile devices
         await navigator.share(shareData);
       } else {
-        // Fallback to copying to clipboard
-        await navigator.clipboard.writeText(window.location.href);
-        // You might want to add a toast notification here
+        await navigator.clipboard.writeText(shareUrl);
         alert('Link copied to clipboard!');
       }
     } catch (error) {
@@ -58,12 +59,27 @@ export const ChatPage = () => {
     }
   }, [chat]);
 
+  const handleBack = () => {
+    navigate('/dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-2 sm:p-6">
       {chat ? (
         <div className="max-w-4xl mx-auto space-y-4 sm:space-y-8">
-          {/* Share Button */}
-          <div className="flex justify-end px-2 sm:px-0">
+          {/* Share/Back Button Row */}
+          <div className="flex justify-between px-2 sm:px-0">
+            {!isShared && (
+              <button
+                onClick={handleBack}
+                className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md
+                         transform transition-all duration-300 hover:scale-105 hover:shadow-lg
+                         text-purple-600 font-medium text-sm sm:text-base"
+              >
+                <span className="text-lg sm:text-xl">←</span>
+                Back to Dashboard
+              </button>
+            )}
             <button
               onClick={handleShare}
               className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md
