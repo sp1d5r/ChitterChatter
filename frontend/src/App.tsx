@@ -19,6 +19,7 @@ import Onboarding from './pages/Onboarding';
 const About = () => <ScrollableLayout><h2>About Page</h2></ScrollableLayout>;
 const Contact = () => <ScrollableLayout><h2>Contact Page</h2></ScrollableLayout>;
 const NotFound = () => <ScrollableLayout><h2>No Clue Mate...</h2></ScrollableLayout>
+const ChatView = () => <p>Individual Chat View - Coming Soon</p>;
 
 function App() {
   return (
@@ -47,6 +48,8 @@ function App() {
 
                   {/* Main Page */}
                   <Route path="/dashboard" element={<Dashboard />} />
+
+                  <Route path="/chat/:chatId" element={<ChatView />} />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
