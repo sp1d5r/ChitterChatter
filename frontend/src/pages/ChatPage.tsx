@@ -151,7 +151,7 @@ export const ChatPage = () => {
                             i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'
                           }</span>
                           <div className="flex-1">
-                            <p className="font-bold">Member #{i + 1}</p>
+                            <p className="font-bold">{member.memberId}</p>
                             <div className="flex gap-4 text-sm">
                               <span>🚩 {member.redFlagScore}/10</span>
                               <span>☢️ {member.toxicityScore}/10</span>
@@ -184,7 +184,7 @@ export const ChatPage = () => {
                             i === 0 ? '👑' : i === 1 ? '🎭' : '🃏'
                           }</span>
                           <div className="flex-1">
-                            <p className="font-bold">Member #{i + 1}</p>
+                            <p className="font-bold">{member.memberId}</p>
                             <p className="text-sm">Funny Rating: {member.funnyScore}/10</p>
                             <p className="text-sm text-blue-500 italic mt-1">
                               "{member.funnyMoments[0]}"
