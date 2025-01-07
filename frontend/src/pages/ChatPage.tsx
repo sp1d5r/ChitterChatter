@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthenticationProvider';
 import { FirebaseDatabaseService } from 'shared';
@@ -36,10 +36,45 @@ export const ChatPage = () => {
     };
   }, [authState.user, chatId]);
   
+  const handleShare = useCallback(async () => {
+    const shareData = {
+      title: `${chat?.conversationType || 'Chat'} Wrapped`,
+      text: `Check out our ${chat?.conversationType || 'chat'} analysis! ${chat?.messageCount || 0} messages of pure chaos 😂`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        // Use native share on mobile devices
+        await navigator.share(shareData);
+      } else {
+        // Fallback to copying to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        // You might want to add a toast notification here
+        alert('Link copied to clipboard!');
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  }, [chat]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-6">
       {chat ? (
         <div className="max-w-4xl mx-auto space-y-8">
+          {/* Add Share Button at the top */}
+          <div className="flex justify-end">
+            <button
+              onClick={handleShare}
+              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md
+                       transform transition-all duration-300 hover:scale-105 hover:shadow-lg
+                       text-purple-600 font-medium"
+            >
+              <span className="text-xl">🔗</span>
+              Share Results
+            </button>
+          </div>
+
           {/* Main Chat Card */}
           <div className="bg-white rounded-3xl shadow-xl p-8 transform transition-all duration-500 hover:scale-[1.01] animate-fadeIn">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 
