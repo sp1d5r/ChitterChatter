@@ -210,7 +210,7 @@ export const ChatPage = () => {
                              className="bg-white/70 p-4 rounded-xl transform transition-all 
                                       hover:scale-[1.02] animate-fadeIn"
                              style={{animationDelay: `${i * 0.2}s`}}>
-                          <p className="font-bold">Member #{i + 1}</p>
+                          <p className="font-bold">{member.memberId}</p>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {member.topicAnalysis.slice(0, 2).map((topic, j) => (
                               <span key={j} 
@@ -243,7 +243,7 @@ export const ChatPage = () => {
                             i === 0 ? '😬' : i === 1 ? '🫣' : '😅'
                           }</span>
                           <div className="flex-1">
-                            <p className="font-bold">Member #{i + 1}</p>
+                            <p className="font-bold">{member.memberId}</p>
                             <p className="text-sm">Cringe Score: {member.cringeScore}/10</p>
                             <p className="text-sm text-orange-500 italic mt-1">
                               "{member.cringeMoments[0]}"
