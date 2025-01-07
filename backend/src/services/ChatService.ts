@@ -628,14 +628,35 @@ export class ChatService {
                - Rate and document their most cringe-worthy moments
                - Note any memorable awkward situations
 
-            Return ONLY an array of member analyses in valid JSON format.`;
+            You MUST return your analysis in this EXACT JSON format (no additional text):
+            [
+                {
+                    "memberId": "string",
+                    "quirks": ["quirk1", "quirk2"],
+                    "funnyScore": number,
+                    "funnyMoments": ["moment1", "moment2"],
+                    "cringeScore": number,
+                    "cringeMoments": ["moment1", "moment2"]
+                }
+            ]`;
 
         return await this.claudeService.query(
             [{
                 role: "user",
                 content: [{
                     type: "text",
-                    text: `${content}\n\nAnalyze these members: ${members.join(', ')}`
+                    text: `${content}\n\nAnalyze these members: ${members.join(', ')}. Return results in this exact JSON format:
+                    [
+                        {
+                            "memberId": "string",
+                            "quirks": ["quirk1", "quirk2"],
+                            "funnyScore": number,
+                            "funnyMoments": ["moment1", "moment2"],
+                            "cringeScore": number,
+                            "cringeMoments": ["moment1", "moment2"]
+                        }
+                    ]
+                    Return only the JSON array itself, as this will be used for further parsing.`
                 }]
             }],
             MemberPersonalityAnalysesSchema,
