@@ -63,13 +63,27 @@ export const ChatPage = () => {
     navigate('/dashboard');
   };
 
+  const handleTryItOut = () => {
+    navigate('/');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-2 sm:p-6">
       {chat ? (
         <div className="max-w-4xl mx-auto space-y-4 sm:space-y-8">
-          {/* Share/Back Button Row */}
+          {/* Share/Back/Try It Button Row */}
           <div className="flex justify-between px-2 sm:px-0">
-            {!isShared && (
+            {isShared ? (
+              <button
+                onClick={handleTryItOut}
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 
+                         rounded-full shadow-md transform transition-all duration-300 
+                         hover:scale-105 hover:shadow-lg text-white font-medium text-sm sm:text-base"
+              >
+                <span className="text-lg sm:text-xl">✨</span>
+                Analyze Your Own Chats!
+              </button>
+            ) : (
               <button
                 onClick={handleBack}
                 className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md
