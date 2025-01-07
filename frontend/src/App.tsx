@@ -14,6 +14,7 @@ import { ApiProvider } from './contexts/ApiContext';
 import { ArticlePage } from './pages/ArticlePage';
 import { ProfileProvider } from './contexts/ProfileProvider';
 import Onboarding from './pages/Onboarding';
+import { ChatPage } from './pages/ChatPage';
 
 // Example components for different routes
 const About = () => <ScrollableLayout><h2>About Page</h2></ScrollableLayout>;
@@ -49,7 +50,7 @@ function App() {
                   {/* Main Page */}
                   <Route path="/dashboard" element={<Dashboard />} />
 
-                  <Route path="/chat/:chatId" element={<ChatView />} />
+                  <Route path="/chat/:chatId" element={<ChatPage />} />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
