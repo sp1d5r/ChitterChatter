@@ -127,98 +127,131 @@ export const ChatPage = () => {
               </div>
             )}
 
-            {/* Member Analysis Section */}
+            {/* Competitive Analysis Section */}
             {chat.analysis?.results && (
               <div className="bg-gradient-to-r from-rose-100 to-pink-100 p-6 rounded-2xl mb-8">
-                <h2 className="text-2xl font-bold mb-4">👀 The Tea Report</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {chat.analysis.results.map((member, i) => (
-                    <div key={i} 
-                         className="bg-white/50 p-4 rounded-xl transform transition-all hover:scale-105 animate-fadeIn"
-                         style={{animationDelay: `${i * 0.2}s`}}>
-                      <h3 className="text-xl font-bold mb-2">Member #{i + 1}</h3>
-                      
-                      {/* Scores Section */}
-                      <div className="space-y-2 mb-4">
-                        <div className="flex justify-between items-center">
-                          <span>🚩 Red Flag Score:</span>
-                          <span className="font-bold text-red-500">{member.redFlagScore}/10</span>
+                <h2 className="text-2xl font-bold mb-6">🏆 Member Rankings</h2>
+                
+                {/* Chaos Champions */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-red-500 to-orange-500 
+                               bg-clip-text text-transparent">
+                    🌶️ Chaos Champions
+                  </h3>
+                  <div className="space-y-3">
+                    {[...chat.analysis.results]
+                      .sort((a, b) => b.redFlagScore + b.toxicityScore - (a.redFlagScore + a.toxicityScore))
+                      .slice(0, 3)
+                      .map((member, i) => (
+                        <div key={i} 
+                             className="bg-white/70 p-4 rounded-xl flex items-center gap-4
+                                      transform transition-all hover:scale-[1.02] animate-slideIn"
+                             style={{animationDelay: `${i * 0.2}s`}}>
+                          <span className="text-2xl">{
+                            i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'
+                          }</span>
+                          <div className="flex-1">
+                            <p className="font-bold">Member #{i + 1}</p>
+                            <div className="flex gap-4 text-sm">
+                              <span>🚩 {member.redFlagScore}/10</span>
+                              <span>☢️ {member.toxicityScore}/10</span>
+                            </div>
+                            <p className="text-sm text-red-500 italic mt-1">
+                              "{member.redFlagReasons[0]}"
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span>😇 Toxicity Level:</span>
-                          <span className="font-bold text-purple-500">{member.toxicityScore}/10</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span>😂 Funny Rating:</span>
-                          <span className="font-bold text-blue-500">{member.funnyScore}/10</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span>😬 Cringe Score:</span>
-                          <span className="font-bold text-orange-500">{member.cringeScore}/10</span>
-                        </div>
-                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                      {/* Top Topics */}
-                      <div className="mb-4">
-                        <h4 className="font-bold mb-2">🎯 Favorite Topics:</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {member.topicAnalysis.slice(0, 3).map((topic, j) => (
-                            <span key={j} 
-                                  className="px-2 py-1 bg-white/70 rounded-full text-sm animate-fadeIn"
-                                  style={{animationDelay: `${j * 0.1}s`}}>
-                              {topic.topic} ({topic.frequency}x)
-                            </span>
-                          ))}
+                {/* Comedy Kings/Queens */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-blue-500 to-cyan-500 
+                               bg-clip-text text-transparent">
+                    🎭 Comedy Royalty
+                  </h3>
+                  <div className="space-y-3">
+                    {[...chat.analysis.results]
+                      .sort((a, b) => b.funnyScore - a.funnyScore)
+                      .slice(0, 3)
+                      .map((member, i) => (
+                        <div key={i} 
+                             className="bg-white/70 p-4 rounded-xl flex items-center gap-4
+                                      transform transition-all hover:scale-[1.02] animate-slideIn"
+                             style={{animationDelay: `${i * 0.2}s`}}>
+                          <span className="text-2xl">{
+                            i === 0 ? '👑' : i === 1 ? '🎭' : '🃏'
+                          }</span>
+                          <div className="flex-1">
+                            <p className="font-bold">Member #{i + 1}</p>
+                            <p className="text-sm">Funny Rating: {member.funnyScore}/10</p>
+                            <p className="text-sm text-blue-500 italic mt-1">
+                              "{member.funnyMoments[0]}"
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                      {/* Quirks */}
-                      <div className="mb-4">
-                        <h4 className="font-bold mb-2">✨ Notable Quirks:</h4>
-                        <ul className="list-disc list-inside">
-                          {member.quirks.slice(0, 2).map((quirk, j) => (
-                            <li key={j} 
-                                className="text-sm animate-slideIn"
-                                style={{animationDelay: `${j * 0.1}s`}}>
-                              {quirk}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      {/* Red Flag Reasons */}
-                      {member.redFlagScore > 7 && (
-                        <div className="mt-2">
-                          <h4 className="font-bold text-red-500 mb-2">⚠️ Red Flags:</h4>
-                          <ul className="list-disc list-inside">
-                            {member.redFlagReasons.slice(0, 2).map((reason, j) => (
-                              <li key={j} 
-                                  className="text-sm text-red-600 animate-slideIn"
-                                  style={{animationDelay: `${j * 0.1}s`}}>
-                                {reason}
-                              </li>
+                {/* Topic Champions */}
+                <div className="mb-8">
+                  <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-purple-500 to-pink-500 
+                               bg-clip-text text-transparent">
+                    🎯 Topic Champions
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[...chat.analysis.results]
+                      .sort((a, b) => b.topicAnalysis[0].frequency - a.topicAnalysis[0].frequency)
+                      .slice(0, 4)
+                      .map((member, i) => (
+                        <div key={i} 
+                             className="bg-white/70 p-4 rounded-xl transform transition-all 
+                                      hover:scale-[1.02] animate-fadeIn"
+                             style={{animationDelay: `${i * 0.2}s`}}>
+                          <p className="font-bold">Member #{i + 1}</p>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {member.topicAnalysis.slice(0, 2).map((topic, j) => (
+                              <span key={j} 
+                                    className="px-2 py-1 bg-purple-100 rounded-full text-sm">
+                                {topic.topic} ({topic.frequency}x)
+                              </span>
                             ))}
-                          </ul>
+                          </div>
                         </div>
-                      )}
+                    ))}
+                  </div>
+                </div>
 
-                      {/* Funny Moments */}
-                      {member.funnyScore > 7 && (
-                        <div className="mt-2">
-                          <h4 className="font-bold text-blue-500 mb-2">🎭 Best Comedy Hits:</h4>
-                          <ul className="list-disc list-inside">
-                            {member.funnyMoments.slice(0, 2).map((moment, j) => (
-                              <li key={j} 
-                                  className="text-sm italic animate-slideIn"
-                                  style={{animationDelay: `${j * 0.1}s`}}>
-                                "{moment}"
-                              </li>
-                            ))}
-                          </ul>
+                {/* Cringe Kings/Queens */}
+                <div>
+                  <h3 className="text-xl font-bold mb-4 bg-gradient-to-r from-orange-500 to-yellow-500 
+                               bg-clip-text text-transparent">
+                    😬 Cringe Champions
+                  </h3>
+                  <div className="space-y-3">
+                    {[...chat.analysis.results]
+                      .sort((a, b) => b.cringeScore - a.cringeScore)
+                      .slice(0, 3)
+                      .map((member, i) => (
+                        <div key={i} 
+                             className="bg-white/70 p-4 rounded-xl flex items-center gap-4
+                                      transform transition-all hover:scale-[1.02] animate-slideIn"
+                             style={{animationDelay: `${i * 0.2}s`}}>
+                          <span className="text-2xl">{
+                            i === 0 ? '😬' : i === 1 ? '🫣' : '😅'
+                          }</span>
+                          <div className="flex-1">
+                            <p className="font-bold">Member #{i + 1}</p>
+                            <p className="text-sm">Cringe Score: {member.cringeScore}/10</p>
+                            <p className="text-sm text-orange-500 italic mt-1">
+                              "{member.cringeMoments[0]}"
+                            </p>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
