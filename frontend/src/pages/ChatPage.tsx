@@ -68,7 +68,7 @@ export const ChatPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-2 sm:p-6">
+    <div className="min-h-screen bg-gradient-to-br from-coffee-100 to-coffee-200 dark:from-background dark:to-coffee-900 p-2 sm:p-6">
       {chat ? (
         <div className="max-w-4xl mx-auto space-y-4 sm:space-y-8">
           {/* Share/Back/Try It Button Row */}
@@ -76,9 +76,9 @@ export const ChatPage = () => {
             {isShared ? (
               <button
                 onClick={handleTryItOut}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 
+                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary 
                          rounded-full shadow-md transform transition-all duration-300 
-                         hover:scale-105 hover:shadow-lg text-white font-medium text-sm sm:text-base"
+                         hover:scale-105 hover:shadow-lg text-coffee-900 dark:text-coffee-50 font-medium text-sm sm:text-base"
               >
                 <span className="text-lg sm:text-xl">✨</span>
                 Analyze Your Own Chats!
@@ -86,9 +86,9 @@ export const ChatPage = () => {
             ) : (
               <button
                 onClick={handleBack}
-                className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md
+                className="flex items-center gap-2 px-4 py-2 bg-coffee-50 dark:bg-coffee-900 rounded-full shadow-md
                          transform transition-all duration-300 hover:scale-105 hover:shadow-lg
-                         text-purple-600 font-medium text-sm sm:text-base"
+                         text-coffee-700 dark:text-coffee-200 font-medium text-sm sm:text-base"
               >
                 <span className="text-lg sm:text-xl">←</span>
                 Back to Dashboard
@@ -106,7 +106,7 @@ export const ChatPage = () => {
           </div>
 
           {/* Main Content */}
-          <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8">
+          <div className="bg-coffee-50 dark:bg-black rounded-2xl sm:rounded-3xl shadow-xl p-4 sm:p-8">
             {/* Title */}
             <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 
                          bg-clip-text text-transparent mb-4 sm:mb-6 animate-pulse">
@@ -115,18 +115,18 @@ export const ChatPage = () => {
 
             {/* Quick Stats Row */}
             <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-8">
-              <div className="p-3 sm:p-6 bg-white rounded-xl sm:rounded-2xl border-2 border-pink-200
-                            transform transition-all hover:-translate-y-1">
+              <div className="p-3 sm:p-6 bg-coffee-50 dark:bg-coffee-900 rounded-xl sm:rounded-2xl border-2 
+                            border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
                 <p className="text-sm sm:text-lg text-purple-600">💬 Messages</p>
                 <p className="text-xl sm:text-4xl font-bold">{chat.messageCount || 0}</p>
               </div>
-              <div className="p-3 sm:p-6 bg-white rounded-xl sm:rounded-2xl border-2 border-blue-200
-                            transform transition-all hover:-translate-y-1">
+              <div className="p-3 sm:p-6 bg-coffee-50 dark:bg-coffee-900 rounded-xl sm:rounded-2xl border-2 
+                            border-secondary dark:border-secondary-dark transform transition-all hover:-translate-y-1">
                 <p className="text-sm sm:text-lg text-blue-600">👥 Members</p>
                 <p className="text-xl sm:text-4xl font-bold">{chat.members?.length || 0}</p>
               </div>
-              <div className="p-3 sm:p-6 bg-white rounded-xl sm:rounded-2xl border-2 border-teal-200
-                            transform transition-all hover:-translate-y-1">
+              <div className="p-3 sm:p-6 bg-coffee-50 dark:bg-coffee-900 rounded-xl sm:rounded-2xl border-2 
+                            border-accent dark:border-accent-dark transform transition-all hover:-translate-y-1">
                 <p className="text-sm sm:text-lg text-teal-600">🌟 Chaos</p>
                 <p className="text-xl sm:text-4xl font-bold">{chat.groupVibe?.results.chaosLevel.rating}/10</p>
               </div>
@@ -134,7 +134,7 @@ export const ChatPage = () => {
 
             {/* Group Personality Section */}
             {chat.groupVibe?.results && (
-              <div className="bg-white border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl 
+              <div className="bg-coffee-50 dark:bg-coffee-900 border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl 
                             mb-4 sm:mb-8 animate-slideIn">
                 <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
                              from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
@@ -157,7 +157,7 @@ export const ChatPage = () => {
 
             {/* Awards Section */}
             {chat.superlatives?.results && (
-              <div className="bg-white border-2 border-amber-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl mb-4 sm:mb-8">
+              <div className="bg-coffee-50 dark:bg-coffee-900 border-2 border-amber-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl mb-4 sm:mb-8">
                 <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
                              from-amber-600 to-orange-600 bg-clip-text text-transparent">
                   🏆 Chat Awards
@@ -165,7 +165,7 @@ export const ChatPage = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {chat.superlatives.results.awards.map((award, i) => (
                     <div key={i} 
-                         className="bg-white border-2 border-amber-100 p-3 sm:p-4 rounded-xl 
+                         className="bg-coffee-50 dark:bg-coffee-900 border-2 border-amber-100 p-3 sm:p-4 rounded-xl 
                                   transform transition-all hover:scale-105"
                          style={{animationDelay: `${i * 0.3}s`}}>
                       <h3 className="font-bold text-base sm:text-lg">🎉 {award.title}</h3>
@@ -190,7 +190,7 @@ export const ChatPage = () => {
                     .sort((a, b) => b.redFlagScore + b.toxicityScore - (a.redFlagScore + a.toxicityScore))
                     .map((member, i) => (
                       <div key={i} 
-                           className={`bg-white p-3 sm:p-4 rounded-xl flex items-center gap-2 sm:gap-4
+                           className={`bg-coffee-50 dark:bg-coffee-900 p-3 sm:p-4 rounded-xl flex items-center gap-2 sm:gap-4
                                     transform transition-all hover:scale-[1.02] animate-slideIn
                                     ${i < 3 ? 'border-2 border-orange-200' : 'border-2 border-gray-100'}`}
                            style={{animationDelay: `${i * 0.1}s`}}>
@@ -231,7 +231,7 @@ export const ChatPage = () => {
                     .sort((a, b) => b.funnyScore - a.funnyScore)
                     .map((member, i) => (
                       <div key={i} 
-                           className={`bg-white p-3 sm:p-4 rounded-xl flex items-center gap-2 sm:gap-4
+                           className={`bg-coffee-50 dark:bg-coffee-900 p-3 sm:p-4 rounded-xl flex items-center gap-2 sm:gap-4
                                     transform transition-all hover:scale-[1.02] animate-slideIn
                                     ${i < 3 ? 'border-2 border-blue-200' : 'border-2 border-gray-100'}`}
                            style={{animationDelay: `${i * 0.1}s`}}>
@@ -269,7 +269,7 @@ export const ChatPage = () => {
                     .sort((a, b) => b.topicAnalysis[0].frequency - a.topicAnalysis[0].frequency)
                     .map((member, i) => (
                       <div key={i} 
-                           className={`bg-white p-4 rounded-xl transform transition-all 
+                           className={`bg-coffee-50 dark:bg-coffee-900 p-4 rounded-xl transform transition-all 
                                     hover:scale-[1.02] animate-fadeIn
                                     ${i < 4 ? 'border-2 border-purple-200' : ''}`}
                            style={{animationDelay: `${i * 0.1}s`}}>
@@ -302,7 +302,7 @@ export const ChatPage = () => {
                     .slice(0, 3)
                     .map((member, i) => (
                       <div key={i} 
-                           className={`bg-white p-4 rounded-xl flex items-center gap-2 sm:gap-4
+                           className={`bg-coffee-50 dark:bg-coffee-900 p-4 rounded-xl flex items-center gap-2 sm:gap-4
                                     transform transition-all hover:scale-[1.02] animate-slideIn
                                     ${i < 3 ? 'border-2 border-orange-200' : 'border-2 border-gray-100'}`}
                            style={{animationDelay: `${i * 0.2}s`}}>

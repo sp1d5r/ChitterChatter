@@ -22,16 +22,28 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        coffee: {
+          50: '#FAF6F1',  // Lightest coffee cream
+          100: '#E8DED3',  // Light coffee cream
+          200: '#D5C3B3',  // Coffee with lots of cream
+          300: '#C2A893',  // Light coffee
+          400: '#AF8D73',  // Medium coffee
+          500: '#9C7253',  // Coffee
+          600: '#895733',  // Dark coffee
+          700: '#763C13',  // Darker coffee
+          800: '#632100',  // Very dark coffee
+          900: '#501800',  // Darkest coffee
+        },
         primary: {
           DEFAULT: "hsl(288 70% 90%)", // Soft lavender
           foreground: "hsl(288 30% 25%)",
-          dark: "hsl(288 70% 30%)", // Dark lavender
+          dark: "hsl(288 40% 40%)", // Adjusted for dark mode
           "dark-foreground": "hsl(288 95% 95%)"
         },
         secondary: {
-          DEFAULT: "hsl(152 70% 90%)", // Mint green
+          DEFAULT: "hsl(152 70% 90%)", // Soft mint
           foreground: "hsl(152 30% 25%)",
-          dark: "hsl(152 70% 30%)", // Dark mint
+          dark: "hsl(152 40% 40%)", // Adjusted for dark mode
           "dark-foreground": "hsl(152 95% 95%)"
         },
         destructive: {
@@ -49,7 +61,7 @@ module.exports = {
         accent: {
           DEFAULT: "hsl(20 70% 90%)", // Soft peach
           foreground: "hsl(20 30% 25%)",
-          dark: "hsl(20 70% 30%)", // Dark peach
+          dark: "hsl(20 40% 40%)", // Adjusted for dark mode
           "dark-foreground": "hsl(20 95% 95%)"
         },
         popover: {
