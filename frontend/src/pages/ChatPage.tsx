@@ -180,146 +180,154 @@ export const ChatPage = () => {
             {/* Rankings Sections */}
             <div className="space-y-4 sm:space-y-8">
               {/* Chaos Rankings */}
-              <div className="mb-4 sm:mb-8">
-                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
-                             from-red-500 to-orange-500 bg-clip-text text-transparent">
-                  🌶️ Chaos Rankings
-                </h3>
-                <div className="space-y-2 sm:space-y-3">
-                  {[...chat.analysis.results]
-                    .sort((a, b) => b.redFlagScore + b.toxicityScore - (a.redFlagScore + a.toxicityScore))
-                    .map((member, i) => (
-                      <div key={i} 
-                           className={`bg-coffee-50 dark:bg-coffee-900 p-3 sm:p-4 rounded-xl flex items-center gap-2 sm:gap-4
-                                    transform transition-all hover:scale-[1.02] animate-slideIn
-                                    ${i < 3 ? 'border-2 border-orange-200' : 'border-2 border-gray-100'}`}
-                           style={{animationDelay: `${i * 0.1}s`}}>
-                        <span className="text-2xl">{
-                          i === 0 ? '🥇' : 
-                          i === 1 ? '🥈' : 
-                          i === 2 ? '🥉' : 
-                          '👀'
-                        }</span>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center">
-                            <p className="font-bold">{member.memberId}</p>
-                            <p className="text-sm text-gray-500">#{i + 1}</p>
-                          </div>
-                          <div className="flex gap-4 text-sm">
-                            <span>🚩 {member.redFlagScore}/10</span>
-                            <span>☢️ {member.toxicityScore}/10</span>
-                          </div>
-                          {i < 3 && (
-                            <p className="text-sm text-red-500 italic mt-1">
-                              "{member.redFlagReasons[0]}"
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+              {chat.analysis?.results && (
+                <div className="mb-4 sm:mb-8">
+                  <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
+                               from-red-500 to-orange-500 bg-clip-text text-transparent">
+                    🌶️ Chaos Rankings
+                  </h3>
+                  <div className="space-y-2 sm:space-y-3">
+                    {[...chat.analysis.results]
+                      .sort((a, b) => b.redFlagScore + b.toxicityScore - (a.redFlagScore + a.toxicityScore))
+                      .map((member, i) => (
+                        <div key={i} 
+                             className={`bg-coffee-50 dark:bg-coffee-900 p-3 sm:p-4 rounded-xl flex items-center gap-2 sm:gap-4
+                                      transform transition-all hover:scale-[1.02] animate-slideIn
+                                      ${i < 3 ? 'border-2 border-orange-200' : 'border-2 border-gray-100'}`}
+                             style={{animationDelay: `${i * 0.1}s`}}>
+                              <span className="text-2xl">{
+                                i === 0 ? '🥇' : 
+                                i === 1 ? '🥈' : 
+                                i === 2 ? '🥉' : 
+                                '👀'
+                              }</span>
+                              <div className="flex-1">
+                                <div className="flex justify-between items-center">
+                                  <p className="font-bold">{member.memberId}</p>
+                                  <p className="text-sm text-gray-500">#{i + 1}</p>
+                                </div>
+                                <div className="flex gap-4 text-sm">
+                                  <span>🚩 {member.redFlagScore}/10</span>
+                                  <span>☢️ {member.toxicityScore}/10</span>
+                                </div>
+                                {i < 3 && (
+                                  <p className="text-sm text-red-500 italic mt-1">
+                                    "{member.redFlagReasons[0]}"
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                      ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Comedy Rankings */}
-              <div className="mb-4 sm:mb-8">
-                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
-                             from-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                  🎭 Comedy Rankings
-                </h3>
-                <div className="space-y-2 sm:space-y-3">
-                  {[...chat.analysis.results]
-                    .sort((a, b) => b.funnyScore - a.funnyScore)
-                    .map((member, i) => (
-                      <div key={i} 
-                           className={`bg-coffee-50 dark:bg-coffee-900 p-3 sm:p-4 rounded-xl flex items-center gap-2 sm:gap-4
-                                    transform transition-all hover:scale-[1.02] animate-slideIn
-                                    ${i < 3 ? 'border-2 border-blue-200' : 'border-2 border-gray-100'}`}
-                           style={{animationDelay: `${i * 0.1}s`}}>
-                        <span className="text-2xl">{
-                          i === 0 ? '👑' : 
-                          i === 1 ? '🎭' : 
-                          i === 2 ? '🃏' : 
-                          '😊'
-                        }</span>
-                        <div className="flex-1">
-                          <div className="flex justify-between items-center">
-                            <p className="font-bold">{member.memberId}</p>
-                            <p className="text-sm text-gray-500">#{i + 1}</p>
-                          </div>
-                          <p className="text-sm">Funny Rating: {member.funnyScore}/10</p>
-                          {i < 3 && member.funnyMoments.length > 0 && (
-                            <p className="text-sm text-blue-500 italic mt-1">
-                              "{member.funnyMoments[0]}"
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ))}
+              {chat.analysis?.results && (
+                <div className="mb-4 sm:mb-8">
+                  <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
+                               from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                    🎭 Comedy Rankings
+                  </h3>
+                  <div className="space-y-2 sm:space-y-3">
+                    {[...chat.analysis.results]
+                      .sort((a, b) => b.funnyScore - a.funnyScore)
+                      .map((member, i) => (
+                        <div key={i} 
+                             className={`bg-coffee-50 dark:bg-coffee-900 p-3 sm:p-4 rounded-xl flex items-center gap-2 sm:gap-4
+                                      transform transition-all hover:scale-[1.02] animate-slideIn
+                                      ${i < 3 ? 'border-2 border-blue-200' : 'border-2 border-gray-100'}`}
+                             style={{animationDelay: `${i * 0.1}s`}}>
+                              <span className="text-2xl">{
+                                i === 0 ? '👑' : 
+                                i === 1 ? '🎭' : 
+                                i === 2 ? '🃏' : 
+                                '😊'
+                              }</span>
+                              <div className="flex-1">
+                                <div className="flex justify-between items-center">
+                                  <p className="font-bold">{member.memberId}</p>
+                                  <p className="text-sm text-gray-500">#{i + 1}</p>
+                                </div>
+                                <p className="text-sm">Funny Rating: {member.funnyScore}/10</p>
+                                {i < 3 && member.funnyMoments.length > 0 && (
+                                  <p className="text-sm text-blue-500 italic mt-1">
+                                    "{member.funnyMoments[0]}"
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                      ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Topic Champions - Grid Layout for Everyone */}
-              <div className="mb-4 sm:mb-8">
-                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
-                             from-purple-500 to-pink-500 bg-clip-text text-transparent">
-                  🎯 Everyone's Hot Topics
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[...chat.analysis.results]
-                    .sort((a, b) => b.topicAnalysis[0].frequency - a.topicAnalysis[0].frequency)
-                    .map((member, i) => (
-                      <div key={i} 
-                           className={`bg-coffee-50 dark:bg-coffee-900 p-4 rounded-xl transform transition-all 
-                                    hover:scale-[1.02] animate-fadeIn
-                                    ${i < 4 ? 'border-2 border-purple-200' : ''}`}
-                           style={{animationDelay: `${i * 0.1}s`}}>
-                        <div className="flex justify-between items-center">
-                          <p className="font-bold">{member.memberId}</p>
-                          {i < 3 && <span className="text-xl">{i === 0 ? '🎯' : i === 1 ? '🎪' : '🎨'}</span>}
+              {chat.analysis?.results && (
+                <div className="mb-4 sm:mb-8">
+                  <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
+                               from-purple-500 to-pink-500 bg-clip-text text-transparent">
+                    🎯 Everyone's Hot Topics
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[...chat.analysis.results]
+                      .sort((a, b) => b.topicAnalysis[0].frequency - a.topicAnalysis[0].frequency)
+                      .map((member, i) => (
+                        <div key={i} 
+                             className={`bg-coffee-50 dark:bg-coffee-900 p-4 rounded-xl transform transition-all 
+                                      hover:scale-[1.02] animate-fadeIn
+                                      ${i < 4 ? 'border-2 border-purple-200' : ''}`}
+                             style={{animationDelay: `${i * 0.1}s`}}>
+                          <div className="flex justify-between items-center">
+                            <p className="font-bold">{member.memberId}</p>
+                            {i < 3 && <span className="text-xl">{i === 0 ? '🎯' : i === 1 ? '🎪' : '🎨'}</span>}
+                          </div>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {member.topicAnalysis.slice(0, 2).map((topic, j) => (
+                              <span key={j} 
+                                    className="px-2 py-1 bg-purple-100 rounded-full text-sm">
+                                {topic.topic} ({topic.frequency}x)
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {member.topicAnalysis.slice(0, 2).map((topic, j) => (
-                            <span key={j} 
-                                  className="px-2 py-1 bg-purple-100 rounded-full text-sm">
-                              {topic.topic} ({topic.frequency}x)
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
+                      ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Cringe Kings/Queens */}
-              <div>
-                <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
-                             from-orange-500 to-yellow-500 bg-clip-text text-transparent">
-                  😬 Cringe Champions
-                </h3>
-                <div className="space-y-2 sm:space-y-3">
-                  {[...chat.analysis.results]
-                    .sort((a, b) => b.cringeScore - a.cringeScore)
-                    .slice(0, 3)
-                    .map((member, i) => (
-                      <div key={i} 
-                           className={`bg-coffee-50 dark:bg-coffee-900 p-4 rounded-xl flex items-center gap-2 sm:gap-4
-                                    transform transition-all hover:scale-[1.02] animate-slideIn
-                                    ${i < 3 ? 'border-2 border-orange-200' : 'border-2 border-gray-100'}`}
-                           style={{animationDelay: `${i * 0.2}s`}}>
-                        <span className="text-2xl">{
-                          i === 0 ? '😬' : i === 1 ? '🫣' : '😅'
-                        }</span>
-                        <div className="flex-1">
-                          <p className="font-bold">{member.memberId}</p>
-                          <p className="text-sm">Cringe Score: {member.cringeScore}/10</p>
-                          <p className="text-sm text-orange-500 italic mt-1">
-                            "{member.cringeMoments[0]}"
-                          </p>
+              {chat.analysis?.results && (
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4 bg-gradient-to-r 
+                               from-orange-500 to-yellow-500 bg-clip-text text-transparent">
+                    😬 Cringe Champions
+                  </h3>
+                  <div className="space-y-2 sm:space-y-3">
+                    {[...chat.analysis.results]
+                      .sort((a, b) => b.cringeScore - a.cringeScore)
+                      .slice(0, 3)
+                      .map((member, i) => (
+                        <div key={i} 
+                             className={`bg-coffee-50 dark:bg-coffee-900 p-4 rounded-xl flex items-center gap-2 sm:gap-4
+                                      transform transition-all hover:scale-[1.02] animate-slideIn
+                                      ${i < 3 ? 'border-2 border-orange-200' : 'border-2 border-gray-100'}`}
+                             style={{animationDelay: `${i * 0.2}s`}}>
+                          <span className="text-2xl">{
+                            i === 0 ? '😬' : i === 1 ? '🫣' : '😅'
+                          }</span>
+                          <div className="flex-1">
+                            <p className="font-bold">{member.memberId}</p>
+                            <p className="text-sm">Cringe Score: {member.cringeScore}/10</p>
+                            <p className="text-sm text-orange-500 italic mt-1">
+                              "{member.cringeMoments[0]}"
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

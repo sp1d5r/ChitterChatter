@@ -82,7 +82,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className={cn(
-      "rounded-md flex flex-col md:flex-row dark:bg-background w-full flex-1 mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden px-1 py-1",
+      "rounded-md flex flex-col md:flex-row  dark:bg-background w-full flex-1 mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden px-1 py-1",
       "h-screen"
     )}>
       <Sidebar open={open} setOpen={setOpen}>
