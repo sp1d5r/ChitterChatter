@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthenticationProvider';
 import { FirebaseDatabaseService } from 'shared';
 import { ChatData } from 'shared/src/types/Chat';
+import { ClipboardIcon } from "lucide-react";
 
 export const ChatPage = () => {
   const { chatId } = useParams();
@@ -11,14 +12,19 @@ export const ChatPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isShared = location.search.includes('shared=true');
+  
+  // Get userId from either auth or URL params
+  const searchParams = new URLSearchParams(location.search);
+  const sharedUserId = searchParams.get('userId');
+  const userId = isShared ? sharedUserId : authState.user?.uid;
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
 
-    if (authState.user?.uid && chatId) {
-      // Set up real-time listener for the specific chat
+    if (userId && chatId) {
+      // Use userId from either auth or URL params
       unsubscribe = FirebaseDatabaseService.listenToDocument<ChatData>(
-        `chats/${authState.user.uid}/conversations/`,
+        `chats/${userId}/conversations/`,
         chatId,
         (updatedChat) => {
           if (updatedChat) {
@@ -31,16 +37,16 @@ export const ChatPage = () => {
       );
     }
 
-    // Cleanup listener when component unmounts or chatId changes
     return () => {
       if (unsubscribe) {
         unsubscribe();
       }
     };
-  }, [authState.user, chatId]);
+  }, [userId, chatId]);
   
   const handleShare = useCallback(async () => {
-    const shareUrl = `${window.location.href}${window.location.search ? '&' : '?'}shared=true`;
+    // Add userId to share URL
+    const shareUrl = `${window.location.href}${window.location.search ? '&' : '?'}shared=true&userId=${authState.user?.uid}`;
     const shareData = {
       title: `${chat?.conversationType || 'Chat'} Wrapped`,
       text: `Check out our ${chat?.conversationType || 'chat'} analysis! ${chat?.messageCount || 0} messages of pure chaos 😂`,
@@ -57,7 +63,7 @@ export const ChatPage = () => {
     } catch (error) {
       console.error('Error sharing:', error);
     }
-  }, [chat]);
+  }, [chat, authState.user?.uid]);
 
   const handleBack = () => {
     navigate('/dashboard');
@@ -94,15 +100,32 @@ export const ChatPage = () => {
                 Back to Dashboard
               </button>
             )}
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md
-                       transform transition-all duration-300 hover:scale-105 hover:shadow-lg
-                       text-purple-600 font-medium text-sm sm:text-base"
-            >
-              <span className="text-lg sm:text-xl">🔗</span>
-              Share Results
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  const shareUrl = `${window.location.href}${window.location.search ? '&' : '?'}shared=true&userId=${authState.user?.uid}`;
+                  navigator.clipboard.writeText(shareUrl);
+                  alert('Link copied to clipboard!');
+                }}
+                className="hidden sm:flex items-center justify-center w-10 h-10 bg-white rounded-full shadow-md
+                          transform transition-all duration-300 hover:scale-105 hover:shadow-lg
+                          text-purple-600"
+                aria-label="Copy link to clipboard"
+              >
+                <span className="text-lg">
+                  <ClipboardIcon className="w-6 h-6" /> 
+                </span>
+              </button>
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md
+                         transform transition-all duration-300 hover:scale-105 hover:shadow-lg
+                         text-purple-600 font-medium text-sm sm:text-base"
+              >
+                <span className="text-lg sm:text-xl">🔗</span>
+                Share Results
+              </button>
+            </div>
           </div>
 
           {/* Main Content */}
