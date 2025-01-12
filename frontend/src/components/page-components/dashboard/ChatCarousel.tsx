@@ -159,7 +159,7 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
   }, []);
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-md dark:text-white">
       <div className="relative rounded-xl border bg-card p-6 shadow-sm">
         <Dialog>
           <DialogTrigger asChild>

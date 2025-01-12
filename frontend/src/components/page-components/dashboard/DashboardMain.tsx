@@ -124,7 +124,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-coffee-50 dark:bg-coffee-900 border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
+            <Card className="bg-coffee-50 dark:bg-transparent border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-600">
                   Total Conversations
@@ -137,7 +137,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-coffee-50 dark:bg-coffee-900 border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
+            <Card className="bg-coffee-50 dark:bg-transparent border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-600">
                   Active Analyses
@@ -152,7 +152,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-coffee-50 dark:bg-coffee-900 border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
+            <Card className="bg-coffee-50 dark:bg-transparent border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-purple-600">
                   Total Members
@@ -176,13 +176,13 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search conversations..."
-                  className="pl-9 bg-coffee-50 dark:bg-coffee-900 border-2 border-violet-200"
+                  className="pl-9 bg-coffee-50 dark:bg-transparent border-2 border-violet-200"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 dark:text-white">
               <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Platform" />
