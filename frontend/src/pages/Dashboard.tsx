@@ -187,10 +187,6 @@ const renderContent = (contentId: string) => {
       return <DashboardMain />;
     case "profile":
       return <DashboardProfile />;
-    case "settings":
-      return <h1>Settings</h1>;
-    case "logout":
-      return <h1>Logout Confirmation</h1>;
     default:
       return <h1>404 Not Found</h1>;
   }

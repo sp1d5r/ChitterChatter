@@ -158,6 +158,10 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
     return () => clearInterval(timer);
   }, []);
 
+  const parseConversationType = (conversationType: string) => {
+    return conversationType.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
+  }
+
   return (
     <div className="w-full max-w-md dark:text-white">
       <div className="relative rounded-xl border bg-card p-6 shadow-sm">
@@ -193,7 +197,7 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-xl font-semibold tracking-tight">{chat.conversationType}</h2>
+              <h2 className="text-xl font-semibold tracking-tight">{parseConversationType(chat.conversationType ?? "")}</h2>
               <p className="text-sm text-muted-foreground">{chat.platform}</p>
             </div>
             
