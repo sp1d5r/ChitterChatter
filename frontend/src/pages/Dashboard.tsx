@@ -86,7 +86,7 @@ const Dashboard: React.FC = () => {
       "h-screen"
     )}>
       <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10 bg-primary dark:bg-background border border-neutral-200 dark:border-primary rounded-l-xl">
+        <SidebarBody className="justify-between gap-10 bg-primary dark:bg-neutral-900 border border-neutral-200 dark:border-primary rounded-l-xl">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             {open ? <Logo /> : <LogoIcon />}
             <div className="mt-8 flex flex-col gap-2 text-gray-800 dark:text-gray-200">
