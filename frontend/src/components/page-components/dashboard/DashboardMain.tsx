@@ -112,7 +112,9 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
         <div className="py-8 space-y-6">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <h1 className="text-4xl font-bold tracking-tight">Your Conversations</h1>
+              <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+                Your Conversations
+              </h1>
               <p className="text-muted-foreground">
                 Analyze and explore your chat insights
               </p>
@@ -122,9 +124,9 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card>
+            <Card className="bg-coffee-50 dark:bg-coffee-900 border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium text-purple-600">
                   Total Conversations
                 </CardTitle>
               </CardHeader>
@@ -135,9 +137,9 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-coffee-50 dark:bg-coffee-900 border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium text-purple-600">
                   Active Analyses
                 </CardTitle>
               </CardHeader>
@@ -150,9 +152,9 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="bg-coffee-50 dark:bg-coffee-900 border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">
+                <CardTitle className="text-sm font-medium text-purple-600">
                   Total Members
                 </CardTitle>
               </CardHeader>
@@ -174,7 +176,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Search conversations..."
-                  className="pl-9"
+                  className="pl-9 bg-coffee-50 dark:bg-coffee-900 border-2 border-violet-200"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -218,11 +220,13 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
         {filteredChats.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredChats.map((chat) => (
-              <ChatCarousel key={chat.id} chat={chat} onDelete={handleDeleteChat} />
+              <div key={chat.id} className="transform transition-all hover:scale-105">
+                <ChatCarousel chat={chat} onDelete={handleDeleteChat} />
+              </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="flex flex-col items-center justify-center py-12 text-center bg-coffee-50 dark:bg-coffee-900 rounded-2xl border-2 border-violet-200">
             <Inbox className="h-12 w-12 text-muted-foreground mb-4" />
             <h3 className="text-lg font-medium">No conversations found</h3>
             <p className="text-sm text-muted-foreground mt-1">
