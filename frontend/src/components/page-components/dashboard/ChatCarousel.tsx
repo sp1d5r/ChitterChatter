@@ -170,8 +170,8 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
   };
 
   return (
-    <div className="w-full max-w-4xl relative">
-      <div className="relative rounded-lg border p-6">
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="relative rounded-xl border bg-card p-6 shadow-sm">
         <Dialog>
           <DialogTrigger asChild>
             <Button
@@ -214,81 +214,91 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
           </DialogContent>
         </Dialog>
 
-        <div className="flex flex-col md:flex-row items-center">
-          <div className="overflow-hidden mx-8 mb-8 w-full">
+        <div className="flex flex-col space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1.5">
+              <h2 className="text-2xl font-semibold">{chat.conversationType}</h2>
+              <p className="text-sm text-muted-foreground">{chat.platform}</p>
+            </div>
+            
+            <div className="flex gap-2">
+              {chat.members.slice(0, 3).map((member) => (
+                <div 
+                  key={member}
+                  className="flex items-center gap-2 rounded-lg bg-muted px-2 py-1"
+                >
+                  <div className="h-4 w-4 rounded-full bg-primary/20" />
+                  <p className="text-sm">{member}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden">
             <div 
-              className="flex transition-transform duration-300 ease-in-out"
+              className="flex transition-transform duration-500 ease-out"
               style={{ transform: `translateX(-${activeCard * 100}%)` }}
             >
               {cards.map((card, index) => (
                 <motion.div
                   key={index}
-                  className="w-full flex-shrink-0 px-4"
+                  className="w-full flex-shrink-0"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-4 px-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="font-bold text-2xl">{card.title}</h3>
+                      <h3 className="font-semibold text-xl">{card.title}</h3>
                       <Button 
                         variant="ghost" 
-                        size="icon"
+                        size="sm"
+                        className="hover:bg-primary/10"
                         onClick={() => {if (chat.id) {window.location.href = `/chat/${chat.id}`;}}}
                       >
                         <ExternalLink className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="w-full h-48 rounded-lg">
+                    <div className="h-[200px] rounded-lg bg-muted/50 p-4">
                       {card.content()}
                     </div>
                   </div>
                 </motion.div>
               ))}
             </div>
-          </div>
 
-          <div className="flex flex-col gap-1">
-            <p className="text-2xl font-bold">{chat.conversationType}</p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{chat.platform}</p>
-            <div className="flex items-center gap-2 flex-wrap">
-                {chat.members.map((member) => (
-                    <div className="flex items-center gap-2">
-                        <div className="rounded-full h-6 w-6 bg-blue-200 dark:bg-blue-800 rounded-lg shadow-sm" />
-                        <p>{member}</p>
-                    </div>
-                ))}
+            <div className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-3 py-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-2 hover:bg-primary/10"
+                onClick={prevCard}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+
+              {cards.map((_, index) => (
+                <button
+                  key={index}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    activeCard === index 
+                      ? 'w-6 bg-primary' 
+                      : 'w-1.5 bg-muted-foreground/30'
+                  }`}
+                  onClick={() => setActiveCard(index)}
+                />
+              ))}
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 hover:bg-primary/10"
+                onClick={nextCard}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-        </div>
-        
-        <div className="flex justify-center items-center space-x-2 mt-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-2 z-10"
-            onClick={prevCard}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          {cards.map((_, index) => (
-            <button
-              key={index}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                activeCard === index ? 'bg-primary' : 'bg-gray-300 dark:bg-gray-600'
-              }`}
-              onClick={() => setActiveCard(index)}
-            />
-          ))}
-
-        <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 z-10"
-            onClick={nextCard}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     </div>
