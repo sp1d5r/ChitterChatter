@@ -40,7 +40,7 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/chats', chatRoutes);
 
 app.listen(port, () => {
-  console.log(`Backend server running at http://localhost:${port}`);
+  console.log(`Backend server running at ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
 });
 
 
