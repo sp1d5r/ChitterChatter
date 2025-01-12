@@ -108,22 +108,22 @@ export class ChatService {
             messageCount: chatData.chatContent.split('\n').length, // Rough estimate
         };
         
+        // Store metadata and run analysis concurrently
+        await Promise.all([
+            FirebaseDatabaseService.updateDocument(
+                `chats/${userId}/conversations/`,
+                chatMetadata.id,
+                chatMetadata,
+                ()=>{
+                    console.log('Upload Success:', chatMetadata.id);
+                },
+                (error)=>{
+                    console.log('Upload Failed:', error);
+                }
+            ),
+            this.analyzeChatAndUpdateMetadata(userId, chatMetadata.id, chatData)
+        ]);
 
-        // Store initial metadata
-        await FirebaseDatabaseService.addDocument(
-            `chats/${userId}/conversations/`,
-            chatMetadata,
-            (docId)=>{
-                console.log('Upload Success:', docId);
-                // Trigger analysis asynchronously
-                this.analyzeChatAndUpdateMetadata(userId, docId, chatData)
-                .catch(error => console.error('Chat analysis failed:', error));
-
-            },
-            (error)=>{
-                console.log('Upload Failed:', error);
-            }
-        );
         return chatMetadata;
     }
 
