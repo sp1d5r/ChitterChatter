@@ -169,8 +169,8 @@ export const SidebarLink = ({
     return (
       <div
         className={cn(
-          "flex items-center justify-start gap-2 group/sidebar py-2 cursor-pointer w-[30px] px-[5px] rounded text-black dark:text-white",
-          active ? "bg-neutral-200 dark:bg-white/30" : "",
+          "flex items-center justify-start gap-2 group/sidebar py-2 cursor-pointer w-[35px] px-[5px] rounded text-black dark:text-white",
+          active ? "bg-coffee-300 dark:bg-coffee-300 w-[32px]" : "",
           className
         )}
         onClick={onClick}

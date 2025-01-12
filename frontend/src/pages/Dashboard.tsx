@@ -133,24 +133,26 @@ const Dashboard: React.FC = () => {
 };
 
 const Logo = () => (
-    <div className="font-normal flex space-x-2 items-center text-sm text-gray-800 dark:text-gray-200 py-1 relative z-20">
-        <LogoIcon />
-        <motion.span
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="font-medium whitespace-pre"
-        >
-        ChitterChatter
-        </motion.span>
-</div>
+  <div className="font-normal flex -space-x-[0.5rem] items-center text-sm text-gray-200 py-1 relative z-20">
+    <p className="text-2xl font-bold text-coffee-500">C</p>
+    <p className="text-2xl font-bold text-coffee-300">C</p>
+    <motion.span
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="font-medium pl-2 whitespace-pre ml-3 bg-gradient-to-r from-coffee-500 via-coffee-300 to-coffee-500 bg-clip-text text-transparent"
+    >
+      ChitterChatter
+    </motion.span>
+  </div>
 );
 
 const LogoIcon = () => (
-<div className="font-normal flex space-x-2 items-center text-sm text-gray-800 dark:text-gray-200 py-1 relative z-2 -space-x-[0.1rem]">
-    <span className="text-xl font-bold text-neutral-800 dark:text-primary">C</span>
-    <span className="text-xl font-bold text-neutral-900 dark:text-accent">C</span>
-</div>
+  <div className="font-normal flex -space-x-2 items-center text-sm text-gray-200 py-1 relative z-20 w-10">
+    <p className="text-2xl font-bold text-coffee-500">C</p>
+    <p className="text-2xl font-bold text-coffee-300">C</p>
+  </div>
 );
+
 
 const UserAvatar = () => (
 <div className="h-7 w-7 flex-shrink-0 rounded-full bg-gray-300 dark:bg-gray-600" />
