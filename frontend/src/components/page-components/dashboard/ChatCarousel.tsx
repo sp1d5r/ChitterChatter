@@ -98,22 +98,23 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
       icon: <Trophy className="h-5 w-5" />,
       bgColor: "bg-amber-50 dark:bg-amber-950",
       content: () => {
-        if (!chat.memorableMoments || chat.memorableMoments.status !== 'completed') {
+        if (!chat.memorableMoments || chat.memorableMoments.status !== 'completed' || !chat.memorableMoments.results.epicDiscussions.length || !chat.memorableMoments.results.epicDiscussions[0].topic || !chat.memorableMoments.results.epicDiscussions[0].highlight) {
           return <div className="flex items-center justify-center h-full">
             <p className="text-sm text-muted-foreground">Analysis pending...</p>
           </div>;
         }
 
         const topMoment = chat.memorableMoments.results.epicDiscussions[0];
+
         return (
           <div className="h-full flex flex-col">
             <div className="space-y-4">
               <div>
                 <h4 className="font-medium mb-2">🔥 Hottest Discussion</h4>
-                <p className="text-lg font-medium leading-tight">{topMoment.topic}</p>
+                <p className="text-lg font-medium leading-tight">{topMoment.topic ?? "No topic found"}</p>
               </div>
               <p className="text-sm text-muted-foreground line-clamp-3">
-                {topMoment.highlight}
+                {topMoment.highlight ?? "No highlight found"}
               </p>
             </div>
           </div>
