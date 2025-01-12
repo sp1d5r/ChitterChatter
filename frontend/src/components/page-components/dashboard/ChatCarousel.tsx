@@ -160,7 +160,7 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
   }, []);
 
   const parseConversationType = (conversationType: string) => {
-    return conversationType.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); });
+    return conversationType.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
   }
 
   return (
