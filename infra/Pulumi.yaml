@@ -1,4 +1,4 @@
-name: monorepo-example
+name: chitter-chatter
 runtime:
   name: python
   options:
