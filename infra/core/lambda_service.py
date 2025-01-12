@@ -45,18 +45,18 @@ class LambdaService:
                 raise e
             
             return aws.lambda_.Function(f"{name}-lambda",
-                role=self.role.arn,
-                package_type="Image",
-                image_uri=f"{repository_url}:{tag_to_use}",
-                timeout=timeout,
-                memory_size=memory,
-                environment={
-                    "variables": environment_variables
-                } if environment_variables else None,
-                opts=pulumi.ResourceOptions(
-                    depends_on=[self.ecr_repository]
+                    role=self.role.arn,
+                    package_type="Image",
+                    image_uri=f"{repository_url}:{tag_to_use}",
+                    timeout=timeout,
+                    memory_size=memory,
+                    environment={
+                        "variables": environment_variables
+                    } if environment_variables else None,
+                    opts=pulumi.ResourceOptions(
+                        depends_on=[self.ecr_repository] + (args.get('depends_on', []))
+                    )
                 )
-            )
 
         # Get environment variables from SSM
         environment_variables = {}
@@ -94,10 +94,22 @@ class LambdaService:
                 role=self.role.name,
                 policy_arn="arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
             )
+        
+        # Create log group
+        log_group = aws.cloudwatch.LogGroup(f"{name}-log-group",
+            name=f"/aws/lambda/{name}-lambda",
+            retention_in_days=14,  # Adjust retention as needed
+            opts=pulumi.ResourceOptions(
+                depends_on=[self.role]
+            )
+        )
 
-        # Create Lambda function with dynamic image check
+        # Then update your Lambda function creation to depend on the log group
         self.function = self.ecr_repository.repository_url.apply(
-            lambda url: create_function({"repository_url": url})
+            lambda url: create_function({
+                "repository_url": url,
+                "depends_on": [log_group]  # Add this dependency
+            })
         )
 
         # Only create API Gateway if Lambda function exists
