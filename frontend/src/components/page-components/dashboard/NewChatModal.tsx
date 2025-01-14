@@ -12,6 +12,7 @@ import { Plus, Check, Upload, Users, X, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Input } from "../../shadcn/input";
 import { ChatData } from "shared";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../shadcn/table";
 
 interface Steps {
     title: string;
@@ -42,6 +43,9 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     isProcessing: false,
     currentAnimationStep: 0,
   });
+  const [detectedNames, setDetectedNames] = useState<string[]>([]);
+  const [nameMapping, setNameMapping] = useState<Record<string, string>>({});
+  const [filePreview, setFilePreview] = useState<string>('');
   
   const steps: Steps[] = [
     {
@@ -63,6 +67,11 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
         title: "Add Members",
         subtitle: "Add the members of the conversation",
         completed: chatData.members.length > 0
+    },
+    {
+        title: "Map Names",
+        subtitle: "Match members to their chat names",
+        completed: chatData.members.every(member => nameMapping[member])
     }
   ];
 
@@ -76,7 +85,9 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     handleNext();
   };
 
-  const handleFileUpload = (file: File) => {
+  const handleFileUpload = async (file: File) => {
+    const text = await file.text();
+    setFilePreview(text);
     setChatData(prev => ({ ...prev, chatFile: file }));
     handleNext();
   };
@@ -104,27 +115,40 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
       ...prev,
       members: prev.members.filter(member => member !== memberToRemove)
     }));
+    if (nameMapping[memberToRemove]) {
+      const { [memberToRemove]: _, ...rest } = nameMapping;
+      setNameMapping(rest);
+    }
+  };
+
+  const handleNameMapping = (originalName: string, mappedName: string) => {
+    setNameMapping(prev => ({
+      ...prev,
+      [originalName]: mappedName
+    }));
   };
 
   const handleSubmitAnimation = async () => {
+    const finalChatData = {
+      ...chatData,
+      nameMapping
+    };
+    
     setAnimationState({ isProcessing: true, currentAnimationStep: 0 });
+    const processingPromise = onFinish(finalChatData);
     
-    const stepDelay = 2000;
-    
-    const processingPromise = onFinish(chatData);
-    
-    await new Promise(resolve => setTimeout(resolve, stepDelay));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     setAnimationState(prev => ({ ...prev, currentAnimationStep: 1 }));
     
-    await new Promise(resolve => setTimeout(resolve, stepDelay));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     setAnimationState(prev => ({ ...prev, currentAnimationStep: 2 }));
     
-    await new Promise(resolve => setTimeout(resolve, stepDelay));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     setAnimationState(prev => ({ ...prev, currentAnimationStep: 3 }));
     
     await Promise.all([
         processingPromise,
-        new Promise(resolve => setTimeout(resolve, stepDelay))
+        new Promise(resolve => setTimeout(resolve, 2000))
     ]);
     
     setOpen(false);
@@ -145,6 +169,21 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
       isProcessing: false,
       currentAnimationStep: 0,
     });
+  };
+
+  const getHighlightedText = (text: string) => {
+    if (!text || !chatData.members.length) return text;
+    
+    let highlightedText = text;
+    chatData.members.forEach(member => {
+      const originalName = nameMapping[member] || member;
+      const regex = new RegExp(`\\[\\d{2}/\\d{2}/\\d{2},\\s\\d{2}:\\d{2}:\\d{2}\\]\\s${originalName}:`, 'g');
+      highlightedText = highlightedText.replace(regex, match => 
+        `<span class="bg-primary/20">${match}</span>`
+      );
+    });
+    
+    return highlightedText;
   };
 
   return (
@@ -381,7 +420,10 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                         <div className="flex flex-col gap-4">
                             <div className="flex flex-wrap gap-2 items-center mb-4">
                                 <Users className="h-6 w-6" />
-                                <p className="text-lg font-medium">Add conversation members</p>
+                                <p className="text-lg font-medium">Add Members</p>
+                                <p className="text-sm text-muted-foreground w-full mt-2">
+                                    Add the members who participated in this conversation
+                                </p>
                             </div>
 
                             <div className="flex gap-2">
@@ -391,42 +433,81 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                                     onChange={(e) => setNewMember(e.target.value)}
                                     onKeyPress={(e) => {
                                         if (e.key === 'Enter') {
-                                            e.preventDefault();
                                             handleAddMember();
                                         }
                                     }}
-                                    className="flex-1"
                                 />
-                                <Button 
-                                    onClick={handleAddMember}
-                                    disabled={!newMember.trim()}
-                                >
-                                    Add
-                                </Button>
+                                <Button onClick={handleAddMember}>Add</Button>
                             </div>
 
                             <div className="flex flex-wrap gap-2 mt-4">
-                                {chatData.members.map((member, index) => (
+                                {chatData.members.map((member) => (
                                     <div
-                                        key={index}
+                                        key={member}
                                         className="flex items-center gap-2 bg-secondary px-3 py-1 rounded-full"
                                     >
                                         <span>{member}</span>
-                                        <button
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-auto p-1 hover:bg-destructive/20"
                                             onClick={() => handleRemoveMember(member)}
-                                            className="hover:text-destructive transition-colors"
                                         >
                                             <X className="h-4 w-4" />
-                                        </button>
+                                        </Button>
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    )}
 
-                            {chatData.members.length === 0 && (
-                                <p className="text-sm text-muted-foreground mt-2">
-                                    No members added yet. Add at least one member to continue.
+                    {currentStep === 4 && (
+                        <div className="flex flex-col gap-4 max-h-[60vh] overflow-hidden">
+                            <div className="flex flex-wrap gap-2 items-center mb-4">
+                                <Users className="h-6 w-6" />
+                                <p className="text-lg font-medium">Map Member Names</p>
+                                <p className="text-sm text-muted-foreground w-full mt-2">
+                                    Enter the names as they appear in your chat for each member
                                 </p>
-                            )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 flex-1 min-h-0">
+                                <div className="overflow-y-auto border rounded-md">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Member</TableHead>
+                                                <TableHead>Name in Chat</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {chatData.members.map((member) => (
+                                                <TableRow key={member}>
+                                                    <TableCell>{member}</TableCell>
+                                                    <TableCell>
+                                                        <Input
+                                                            className="w-full"
+                                                            placeholder="Enter name as it appears in chat"
+                                                            value={nameMapping[member] || ''}
+                                                            onChange={(e) => handleNameMapping(member, e.target.value)}
+                                                        />
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+
+                                <div className="flex flex-col min-h-0">
+                                    <p className="text-sm font-medium mb-2">Chat Preview</p>
+                                    <div 
+                                        className="flex-1 border rounded-md p-4 overflow-y-auto font-mono text-sm whitespace-pre-wrap"
+                                        dangerouslySetInnerHTML={{ 
+                                            __html: getHighlightedText(filePreview)
+                                        }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     )}
                 </motion.div>
