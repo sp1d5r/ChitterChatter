@@ -287,6 +287,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                                 variant={chatData.platform === 'messenger' ? 'default' : 'outline'}
                                 className="h-auto p-4 justify-start"
                                 onClick={() => handlePlatformSelect('messenger')}
+                                disabled
                             >
                                 <div className="flex flex-col items-start">
                                     <span className="font-semibold">Facebook Messenger</span>
@@ -297,6 +298,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                             <Button 
                                 variant={chatData.platform === 'discord' ? 'default' : 'outline'}
                                 className="h-auto p-4 justify-start"
+                                disabled
                                 onClick={() => handlePlatformSelect('discord')}
                             >
                                 <div className="flex flex-col items-start">
