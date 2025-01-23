@@ -199,7 +199,7 @@ export const ChatCarousel: React.FC<ChatCarouselProps> = ({ chat, onDelete }) =>
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <h2 className="text-xl font-semibold tracking-tight">{parseConversationType(chat.conversationType ?? "")}</h2>
-              <p className="text-sm text-muted-foreground">{chat.platform}</p>
+              <p className="text-sm text-muted-foreground dark:text-white">{chat.platform}</p>
             </div>
             
             <div className="flex -space-x-2">

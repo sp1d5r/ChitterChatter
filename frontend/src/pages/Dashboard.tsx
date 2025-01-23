@@ -133,13 +133,13 @@ const Dashboard: React.FC = () => {
 };
 
 const Logo = () => (
-  <div className="font-normal flex -space-x-[0.5rem] items-center text-sm text-gray-200 py-1 relative z-20">
-    <p className="text-2xl font-bold text-coffee-500">C</p>
-    <p className="text-2xl font-bold text-coffee-300">C</p>
+  <div className="font-normal flex -space-x-1 items-center text-sm text-gray-200 py-1 relative z-20">
+    <p className="text-2xl font-black text-secondary dark:text-white">C</p>
+    <p className="text-2xl font-black text-accent dark:text-white">C</p>
     <motion.span
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="font-medium pl-2 whitespace-pre ml-3 bg-gradient-to-r from-coffee-500 via-coffee-300 to-coffee-500 bg-clip-text text-transparent"
+      className="text-xl font-bold pl-2 whitespace-pre ml-3 text-secondary dark:text-primary"
     >
       ChitterChatter
     </motion.span>
@@ -147,9 +147,9 @@ const Logo = () => (
 );
 
 const LogoIcon = () => (
-  <div className="font-normal flex -space-x-2 items-center text-sm text-gray-200 py-1 relative z-20 w-10">
-    <p className="text-2xl font-bold text-coffee-500">C</p>
-    <p className="text-2xl font-bold text-coffee-300">C</p>
+  <div className="font-normal flex -space-x-1 items-center text-sm text-gray-200 py-1 relative z-20 w-10">
+    <p className="text-2xl font-black text-secondary dark:text-white">C</p>
+    <p className="text-2xl font-black text-accent dark:text-white">C</p>
   </div>
 );
 
