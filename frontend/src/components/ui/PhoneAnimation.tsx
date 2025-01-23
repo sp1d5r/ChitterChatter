@@ -21,6 +21,15 @@ export const BackgroundPhoneAnimation = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const parentRef = useRef<HTMLDivElement>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
 
   const [floatingElements, setFloatingElements] = useState<FloatingElementProps[]>([
     {
@@ -80,51 +89,39 @@ export const BackgroundPhoneAnimation = ({
         }}
       >
         {/* iPhone frame with more accurate dimensions and notch */}
-        <div className="hidden md:flex relative w-[290px] h-[580px] bg-black rounded-[50px] border-4 border-gray-800 shadow-xl">
-          {/* Notch */}
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[120px] h-7 bg-black rounded-b-3xl z-20" />
-          
-          {/* Screen */}
-          <div className="absolute top-0 left-0 right-0 bottom-0 m-[4px] bg-white rounded-[46px] overflow-hidden">
-            {/* Chat Interface */}
-            <div className="w-full h-full bg-gray-50 flex flex-col">
-                <div className="w-full h-7 flex justify-between items-center">
-                    <div className="w-1/2 flex justify-start items-center h-full px-6 py-3">
-                        <p className="text-[10px] font-bold"> 
-                            Lebara 4G
-                        </p>
-                    </div>
-                    <div className="w-1/2 flex justify-end items-center h-full px-6 py-3">
-                        <p className="text-[10px] font-bold"> 
-                            100%
-                        </p>
-                    </div>
-                </div>
-              {/* Chat Header */}
-              <div className="bg-white p-4 border-b">
-                <h3 className="text-lg font-semibold text-center text-gray-800">ChitterChatter</h3>
+        <div className="hidden md:flex relative w-[290px] h-[580px] justify-center  bg-gradient-to-br from-accent via-primary to-secondary rounded-[50px] border-4 border-gray-800 shadow-xl">
+           <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="text-center mt-20 text-white"
+            >
+              <div className="text-6xl font-bold font-chivo">
+                {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
-              
-              {/* Chat Messages */}
-              <div className="flex-1 p-4 space-y-4">
-                <div className="ml-auto max-w-[70%] bg-purple-100 p-3 rounded-2xl rounded-tr-sm">
-                  omg spill the tea sis ☕️
-                </div>
-                <div className="mr-auto max-w-[70%] bg-gray-100 p-3 rounded-2xl rounded-tl-sm">
-                  your sass level is off the charts 💅
-                </div>
-                <div className="ml-auto max-w-[70%] bg-purple-100 p-3 rounded-2xl rounded-tr-sm">
-                  periodt! 💁‍♀️
-                </div>
+              <div className="text-lg mt-2 font-jakarta">
+                {currentTime.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>
+          </motion.div>
 
-              {/* Chat Input */}
-              <div className="w-full h-16 bg-gray-50 flex justify-center items-center pb-4 px-4 gap-2">
-                <input type="text" className="w-full h-full bg-white rounded-full px-4 py-2" placeholder="Type a message..." />
-                <button className="bg-purple-500 text-white px-4 py-2 rounded-full text-xs"><ArrowRightIcon className="w-4 h-4" /></button>
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.5 }}
+            className="absolute bottom-20 left-4 right-4 bg-white/10 backdrop-blur-lg rounded-xl p-2 shadow-lg"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-6 h-6 rounded-md bg-accent flex items-center justify-center">
+                <svg className="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-white text-sm font-semibold font-jakarta">Chitter Chatter</h3>
+                <p className="text-white/80 text-xs">Your chat has been analyzed!</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </motion.div>
 
@@ -162,7 +159,7 @@ const FloatingElement = ({
       case 'chat':
         return 'bg-white/90 px-4 py-2 rounded-full shadow-lg text-sm font-medium';
       case 'stat':
-        return 'bg-purple-100/90 px-4 py-2 rounded-lg font-medium shadow-lg text-sm';
+        return 'bg-destructive/90 px-4 py-2 rounded-lg font-medium shadow-lg text-sm';
       default:
         return '';
     }
