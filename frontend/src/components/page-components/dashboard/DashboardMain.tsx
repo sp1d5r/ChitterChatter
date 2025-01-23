@@ -112,7 +112,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
         <div className="py-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div className="space-y-1">
-              <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+              <h1 className="font-chivo text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
                 Your Conversations
               </h1>
               <p className="text-muted-foreground">
