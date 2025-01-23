@@ -10,9 +10,10 @@ import {
 import { Button } from "../../shadcn/button";
 import { Plus, Check, Upload, Users, X, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
-import { Input } from "../../shadcn/input";
 import { ChatData } from "shared";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../shadcn/table";
+import { WhatsAppChatParser, ParsedWhatsAppChat } from "../../../utils/chat-parsers/WhatsAppChatParser";
+import { Slider } from "../../shadcn/slider";
+import { format } from "date-fns";
 
 interface Steps {
     title: string;
@@ -38,14 +39,15 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     chatFile: null,
     members: []
   });
-  const [newMember, setNewMember] = useState('');
   const [animationState, setAnimationState] = useState<AnimationState>({
     isProcessing: false,
     currentAnimationStep: 0,
   });
   const [detectedNames, setDetectedNames] = useState<string[]>([]);
-  const [nameMapping, setNameMapping] = useState<Record<string, string>>({});
   const [filePreview, setFilePreview] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [parsedChat, setParsedChat] = useState<ParsedWhatsAppChat | null>(null);
+  const [messageRange, setMessageRange] = useState<[number, number]>([0, 2000]);
   
   const steps: Steps[] = [
     {
@@ -64,14 +66,9 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
         completed: !!chatData.chatFile
     },
     {
-        title: "Add Members",
-        subtitle: "Add the members of the conversation",
+        title: "Select Members",
+        subtitle: "Select members to analyze",
         completed: chatData.members.length > 0
-    },
-    {
-        title: "Map Names",
-        subtitle: "Match members to their chat names",
-        completed: chatData.members.every(member => nameMapping[member])
     }
   ];
 
@@ -86,8 +83,24 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
   };
 
   const handleFileUpload = async (file: File) => {
+    setError(null);
     const text = await file.text();
+    
+    if (chatData.platform === 'whatsapp' && !WhatsAppChatParser.validateFormat(text)) {
+      setError('Invalid WhatsApp chat format. Please ensure you\'ve exported the chat correctly from WhatsApp.');
+      return;
+    }
+    
     setFilePreview(text);
+    
+    if (chatData.platform === 'whatsapp') {
+      const parsed = WhatsAppChatParser.parse(text);
+      setParsedChat(parsed);
+      setDetectedNames(Array.from(parsed.uniqueSenders));
+      const totalMessages = parsed.messages.length;
+      setMessageRange([Math.max(0, totalMessages - 2000), totalMessages]);
+    }
+    
     setChatData(prev => ({ ...prev, chatFile: file }));
     handleNext();
   };
@@ -100,38 +113,20 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
-  const handleAddMember = () => {
-    if (newMember.trim() && !chatData.members.includes(newMember.trim())) {
-      setChatData(prev => ({
-        ...prev,
-        members: [...prev.members, newMember.trim()]
-      }));
-      setNewMember('');
-    }
-  };
-
-  const handleRemoveMember = (memberToRemove: string) => {
-    setChatData(prev => ({
-      ...prev,
-      members: prev.members.filter(member => member !== memberToRemove)
-    }));
-    if (nameMapping[memberToRemove]) {
-      const { [memberToRemove]: _, ...rest } = nameMapping;
-      setNameMapping(rest);
-    }
-  };
-
-  const handleNameMapping = (originalName: string, mappedName: string) => {
-    setNameMapping(prev => ({
-      ...prev,
-      [originalName]: mappedName
-    }));
-  };
-
   const handleSubmitAnimation = async () => {
+    if (!parsedChat) return;
+
+    // Generate filtered chat file
+    const filteredChatFile = WhatsAppChatParser.generateFilteredChatFile(
+      parsedChat,
+      chatData.members,
+      messageRange
+    );
+
     const finalChatData = {
       ...chatData,
-      nameMapping
+      chatFile: filteredChatFile,
+      messageRange
     };
     
     setAnimationState({ isProcessing: true, currentAnimationStep: 0 });
@@ -147,8 +142,8 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     setAnimationState(prev => ({ ...prev, currentAnimationStep: 3 }));
     
     await Promise.all([
-        processingPromise,
-        new Promise(resolve => setTimeout(resolve, 2000))
+      processingPromise,
+      new Promise(resolve => setTimeout(resolve, 2000))
     ]);
     
     setOpen(false);
@@ -164,7 +159,6 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
       chatFile: null,
       members: []
     });
-    setNewMember('');
     setAnimationState({
       isProcessing: false,
       currentAnimationStep: 0,
@@ -176,7 +170,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
     
     let highlightedText = text;
     chatData.members.forEach(member => {
-      const originalName = nameMapping[member] || member;
+      const originalName = detectedNames.includes(member) ? member : member;
       const regex = new RegExp(`\\[\\d{2}/\\d{2}/\\d{2},\\s\\d{2}:\\d{2}:\\d{2}\\]\\s${originalName}:`, 'g');
       highlightedText = highlightedText.replace(regex, match => 
         `<span class="bg-primary/20">${match}</span>`
@@ -387,7 +381,9 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
               {currentStep === 2 && (
                 <div className="flex flex-col gap-4">
                   <div 
-                    className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-primary transition-colors"
+                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                      error ? 'border-red-500' : 'hover:border-primary'
+                    }`}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       e.preventDefault();
@@ -404,7 +400,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                       input.click();
                     }}
                   >
-                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <Upload className={`mx-auto h-12 w-12 ${error ? 'text-red-500' : 'text-gray-400'}`} />
                     <p className="mt-2">
                       {chatData.chatFile ? 
                         chatData.chatFile.name : 
@@ -412,6 +408,26 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                       }
                     </p>
                   </div>
+                  
+                  {error && (
+                    <div className="flex items-center gap-2 text-red-500 text-sm mt-2">
+                      <X className="h-4 w-4" />
+                      <span>{error}</span>
+                    </div>
+                  )}
+                  
+                  {chatData.platform === 'whatsapp' && (
+                    <div className="text-sm text-muted-foreground mt-2">
+                      <p className="font-medium">How to export your WhatsApp chat:</p>
+                      <ol className="list-decimal list-inside mt-1 space-y-1">
+                        <li>Open the chat in WhatsApp</li>
+                        <li>Tap the three dots menu (⋮)</li>
+                        <li>Select 'More' → 'Export chat'</li>
+                        <li>Choose 'Without media'</li>
+                        <li>Save the exported .txt file</li>
+                      </ol>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -419,94 +435,85 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-wrap gap-2 items-center mb-4">
                     <Users className="h-6 w-6" />
-                    <p className="text-lg font-medium">Add Members</p>
+                    <p className="text-lg font-medium">Select Members</p>
                     <p className="text-sm text-muted-foreground w-full mt-2">
-                      Add the members who participated in this conversation
+                      Select the members you want to analyze from the detected names in your chat. These are the exact names as they appear in your messages.
                     </p>
                   </div>
 
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter member name"
-                      value={newMember}
-                      onChange={(e) => setNewMember(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleAddMember();
-                        }
-                      }}
-                    />
-                    <Button onClick={handleAddMember}>Add</Button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {chatData.members.map((member) => (
-                      <div
-                        key={member}
-                        className="flex items-center gap-2 bg-secondary px-3 py-1 rounded-full"
-                      >
-                        <span>{member}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-auto p-1 hover:bg-destructive/20"
-                          onClick={() => handleRemoveMember(member)}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
+                  {parsedChat && parsedChat.messages.length > 0 && (
+                    <div className="mb-6">
+                      <p className="text-sm font-medium mb-2">Message Range Selection</p>
+                      <div className="space-y-4">
+                        <Slider
+                          value={messageRange}
+                          min={0}
+                          max={parsedChat.messages.length}
+                          step={1}
+                          onValueChange={(value: [number, number]) => setMessageRange(value)}
+                          className="my-4"
+                        />
+                        <div className="flex justify-between text-sm text-muted-foreground">
+                          <div>
+                            <p>From: {parsedChat.messages[messageRange[0]] ? 
+                              format(parsedChat.messages[messageRange[0]].timestamp, 'PPP') : 
+                              'No messages'}</p>
+                            <p className="text-xs">Message {messageRange[0]} of {parsedChat.messages.length}</p>
+                          </div>
+                          <div className="text-right">
+                            <p>To: {parsedChat.messages[messageRange[1] - 1] ? 
+                              format(parsedChat.messages[messageRange[1] - 1].timestamp, 'PPP') : 
+                              'No messages'}</p>
+                            <p className="text-xs">Message {messageRange[1]} of {parsedChat.messages.length}</p>
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Selected {messageRange[1] - messageRange[0]} messages for analysis
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {currentStep === 4 && (
-                <div className="flex flex-col gap-4 h-full">
-                  <div className="flex flex-wrap gap-2 items-center mb-4">
-                    <Users className="h-6 w-6" />
-                    <p className="text-lg font-medium">Map Member Names</p>
-                    <p className="text-sm text-muted-foreground w-full mt-2">
-                      Enter the names as they appear in your chat for each member
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 min-h-0">
-                    <div className="overflow-y-auto border rounded-md">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Member</TableHead>
-                            <TableHead>Name in Chat</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {chatData.members.map((member) => (
-                            <TableRow key={member}>
-                              <TableCell className="whitespace-nowrap">{member}</TableCell>
-                              <TableCell>
-                                <Input
-                                  className="w-full"
-                                  placeholder="Enter name as it appears in chat"
-                                  value={nameMapping[member] || ''}
-                                  onChange={(e) => handleNameMapping(member, e.target.value)}
-                                />
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
                     </div>
+                  )}
 
-                    <div className="flex flex-col min-h-0">
-                      <p className="text-sm font-medium mb-2">Chat Preview</p>
-                      <div 
-                        className="flex-1 border rounded-md p-4 overflow-y-auto font-mono text-sm whitespace-pre-wrap"
-                        dangerouslySetInnerHTML={{ 
-                          __html: getHighlightedText(filePreview)
-                        }}
-                      />
+                  {detectedNames.length > 0 ? (
+                    <div className="space-y-4">
+                      <div className="flex flex-col gap-2">
+                        <p className="text-sm font-medium">Detected Names</p>
+                        <p className="text-sm text-muted-foreground">
+                          Click on the names to select or deselect them for analysis. Names are shown exactly as they appear in your chat.
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {Array.from(detectedNames).map((name) => (
+                          <Button
+                            key={name}
+                            variant={chatData.members.includes(name) ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => {
+                              setChatData(prev => ({
+                                ...prev,
+                                members: prev.members.includes(name)
+                                  ? prev.members.filter(m => m !== name)
+                                  : [...prev.members, name]
+                              }));
+                            }}
+                            className="flex items-center gap-2"
+                          >
+                            {name}
+                            {chatData.members.includes(name) && (
+                              <Check className="h-4 w-4" />
+                            )}
+                          </Button>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
+                        <p>Selected {chatData.members.length} of {detectedNames.length} members</p>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="text-sm text-muted-foreground">
+                      No names detected in the chat. Please ensure your chat file contains messages.
+                    </div>
+                  )}
                 </div>
               )}
             </motion.div>
