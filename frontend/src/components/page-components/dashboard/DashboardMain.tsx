@@ -80,6 +80,9 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
           formData.append('platform', chatData.platform as string);
           formData.append('conversationType', chatData.conversationType as string);
           formData.append('members', JSON.stringify(chatData.members));
+          if (chatData.analytics) {
+            formData.append('analytics', JSON.stringify(chatData.analytics));
+          }
           
           if (chatData.chatFile) {
               formData.append('chatFile', chatData.chatFile);

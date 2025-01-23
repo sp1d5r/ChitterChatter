@@ -11,7 +11,7 @@ import { Button } from "../../shadcn/button";
 import { Plus, Check, Upload, Users, X, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { ChatData } from "shared";
-import { WhatsAppChatParser, ParsedWhatsAppChat } from "../../../utils/chat-parsers/WhatsAppChatParser";
+import { WhatsAppChatParser, ParsedWhatsAppChat, ChatAnalyticsService } from "../../../utils/chat-parsers/WhatsAppChatParser";
 import { Slider } from "../../shadcn/slider";
 import { format } from "date-fns";
 
@@ -122,6 +122,12 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
   const handleSubmitAnimation = async () => {
     if (!parsedChat) return;
 
+    // Generate analytics before creating the file
+    const analytics = ChatAnalyticsService.analyzeChat(
+      parsedChat.messages.slice(messageRange[0], messageRange[1])
+        .filter(msg => chatData.members.includes(msg.sender))
+    );
+
     // Generate filtered chat file with context
     const filteredChatFile = WhatsAppChatParser.generateFilteredChatFile(
       parsedChat,
@@ -134,7 +140,8 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
       ...chatData,
       chatFile: filteredChatFile,
       messageRange,
-      context: chatContext
+      context: chatContext,
+      analytics // Include the pre-computed analytics
     };
     
     setAnimationState({ isProcessing: true, currentAnimationStep: 0 });

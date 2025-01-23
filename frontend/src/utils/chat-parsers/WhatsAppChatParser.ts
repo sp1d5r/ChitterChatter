@@ -1,3 +1,5 @@
+import { ChatAnalytics, MessageTimelineData, MemberStats } from "shared";
+
 interface WhatsAppMessage {
     timestamp: Date;
     sender: string;
@@ -227,5 +229,140 @@ export  interface ParsedWhatsAppChat {
         'filtered_chat.txt', 
         { type: 'text/plain' }
       );
+    }
+  }
+
+  export class ChatAnalyticsService {
+    private static readonly WORDS_TO_IGNORE = new Set([
+      'the', 'be', 'to', 'of', 'and', 'a', 'in', 'that', 'have', 'i',
+      'it', 'for', 'not', 'on', 'with', 'he', 'as', 'you', 'do', 'at'
+    ]);
+  
+    private static readonly LAUGH_EMOJIS = new Set([
+      '😂', '🤣', '😅', '😆', '😄', '😃', '😀', 'haha', 'hehe', 'lol', 'lmao'
+    ]);
+  
+    private static readonly READING_SPEED_WPM = 200;
+    private static readonly TYPING_SPEED_WPM = 40;
+  
+    private static getTopItems<T extends 'emoji' | 'word'>(
+      counts: Record<string, number>,
+      limit: number,
+      type: T
+    ): Array<{ [K in T]: string } & { count: number }> {
+      return Object.entries(counts)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, limit)
+        .map(([item, count]) => ({ [type]: item, count } as any));
+    }
+  
+    static analyzeChat(messages: WhatsAppMessage[]): ChatAnalytics {
+      const memberStats: Record<string, MemberStats> = {};
+      const emojiCounts: Record<string, number> = {};
+      const wordCounts: Record<string, number> = {};
+      const memberEmojiCounts: Record<string, Record<string, number>> = {};
+      const memberWordCounts: Record<string, Record<string, number>> = {};
+      const timeline: MessageTimelineData = {
+        hourly: Object.fromEntries([...Array(24)].map((_, i) => [i, 0])),
+        daily: {
+          'Monday': 0, 'Tuesday': 0, 'Wednesday': 0,
+          'Thursday': 0, 'Friday': 0, 'Saturday': 0, 'Sunday': 0
+        }
+      };
+  
+      let totalLaughs = 0;
+  
+      // Initialize member stats and count maps
+      const uniqueMembers = new Set(messages.map(m => m.sender));
+      uniqueMembers.forEach(member => {
+        memberStats[member] = {
+          messageCount: 0,
+          topEmojis: [],
+          averageMessageLength: 0,
+          estimatedTimeSpent: 0,
+          topWords: []
+        };
+        memberEmojiCounts[member] = {};
+        memberWordCounts[member] = {};
+      });
+  
+      // Process messages
+      messages.forEach(msg => {
+        const hour = msg.timestamp.getHours();
+        const day = msg.timestamp.toLocaleDateString('en-US', { weekday: 'long' });
+        timeline.hourly[hour]++;
+        timeline.daily[day]++;
+  
+        // Member specific stats
+        const memberStat = memberStats[msg.sender];
+        memberStat.messageCount++;
+  
+        if (msg.content) {
+          // Extract and count emojis
+          const emojis = this.extractEmojis(msg.content);
+          emojis.forEach(emoji => {
+            emojiCounts[emoji] = (emojiCounts[emoji] || 0) + 1;
+            memberEmojiCounts[msg.sender][emoji] = (memberEmojiCounts[msg.sender][emoji] || 0) + 1;
+            if (this.LAUGH_EMOJIS.has(emoji)) totalLaughs++;
+          });
+  
+          // Extract and count words
+          const words = this.extractWords(msg.content);
+          words.forEach(word => {
+            wordCounts[word] = (wordCounts[word] || 0) + 1;
+            memberWordCounts[msg.sender][word] = (memberWordCounts[msg.sender][word] || 0) + 1;
+          });
+  
+          // Calculate time spent
+          const timeSpent = this.calculateTimeSpent(msg.content);
+          memberStat.estimatedTimeSpent += timeSpent;
+          memberStat.averageMessageLength += msg.content.length;
+        }
+      });
+  
+      // Finalize member stats
+      Object.entries(memberStats).forEach(([member, stats]) => {
+        if (stats.messageCount > 0) {
+          stats.averageMessageLength = Math.round(stats.averageMessageLength / stats.messageCount);
+          stats.estimatedTimeSpent = Math.round(stats.estimatedTimeSpent);
+          stats.topEmojis = this.getTopItems(memberEmojiCounts[member], 5, 'emoji');
+          stats.topWords = this.getTopItems(memberWordCounts[member], 5, 'word');
+        }
+      });
+  
+      return {
+        groupStats: {
+          totalMessages: messages.length,
+          topEmojis: this.getTopItems(emojiCounts, 10, 'emoji'),
+          laughCount: totalLaughs,
+          topWords: this.getTopItems(wordCounts, 10, 'word'),
+          timeline
+        },
+        memberStats
+      };
+    }
+  
+    private static extractEmojis(text: string): string[] {
+      // Updated emoji regex to better match actual emojis
+      const emojiRegex = /(\p{Emoji_Presentation}|\p{Emoji}\uFE0F)/gu;
+      return Array.from(text.match(emojiRegex) || []);
+    }
+  
+    private static extractWords(text: string): string[] {
+      return text.toLowerCase()
+        .replace(/[^\w\s]/gi, ' ') // Replace punctuation with spaces
+        .split(/\s+/)
+        .filter(word => 
+          word.length > 2 && 
+          !this.WORDS_TO_IGNORE.has(word) &&
+          !/^\d+$/.test(word) // Ignore numbers
+        );
+    }
+  
+    private static calculateTimeSpent(message: string): number {
+      const wordCount = message.split(/\s+/).length;
+      const readingTime = wordCount / this.READING_SPEED_WPM;
+      const typingTime = wordCount / this.TYPING_SPEED_WPM;
+      return readingTime + typingTime;
     }
   }

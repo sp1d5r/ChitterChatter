@@ -1,10 +1,11 @@
-import { ChatData, FirebaseDatabaseService, ClaudeService } from "shared";
+import { ChatData, FirebaseDatabaseService, ClaudeService, ChatAnalytics, ChatAnalyticsSchema } from "shared";
 import crypto from 'crypto';
 import { z } from 'zod';
 
 // Create a new type for processed chat data without the file
 type ProcessedChatData = Omit<ChatData, 'chatFile'> & {
     chatContent: string;
+    analytics?: ChatAnalytics;
 };
 
 // Type for what we actually store in Firestore
@@ -18,6 +19,7 @@ interface StoredChatMetadata {
     createdAt: Date;
     status: 'pending' | 'processing' | 'completed' | 'failed';
     messageCount?: number;
+    analytics?: ChatAnalytics;
     // Add any other metadata you want to track
 }
 
@@ -107,6 +109,20 @@ export class ChatService {
             status: 'pending',
             messageCount: chatData.chatContent.split('\n').length, // Rough estimate
         };
+
+        // Validate and store analytics if present
+        if (chatData.analytics) {
+            try {
+                // Validate analytics data
+                const validatedAnalytics = ChatAnalyticsSchema.parse(chatData.analytics);
+                chatMetadata.analytics = validatedAnalytics;
+                
+                console.log('Successfully validated and stored chat analytics');
+            } catch (error) {
+                console.error('Invalid analytics data:', error);
+                // Still proceed with chat creation even if analytics validation fails
+            }
+        }
         
         // Store metadata and run analysis concurrently
         await Promise.all([
@@ -114,10 +130,10 @@ export class ChatService {
                 `chats/${userId}/conversations/`,
                 chatMetadata.id,
                 chatMetadata,
-                ()=>{
+                () => {
                     console.log('Upload Success:', chatMetadata.id);
                 },
-                (error)=>{
+                (error) => {
                     console.log('Upload Failed:', error);
                 }
             ),

@@ -4,6 +4,9 @@ import { useAuth } from '../contexts/AuthenticationProvider';
 import { FirebaseDatabaseService } from 'shared';
 import { ChatData } from 'shared/src/types/Chat';
 import { ClipboardIcon } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
+import { format } from 'date-fns';
+import { ResponsiveContainer, CartesianGrid } from 'recharts';
 
 export const ChatPage = () => {
   const { chatId } = useParams();
@@ -365,6 +368,126 @@ export const ChatPage = () => {
                 </div>
               )}
             </div>
+
+            {/* Analytics */}
+            {chat?.analytics && (
+              <div className="space-y-6">
+                {/* Message Distribution */}
+                <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                  <h3 className="text-xl font-bold mb-4">Message Distribution</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(chat.analytics.memberStats).map(([member, stats]) => (
+                      <div key={member} 
+                           className="flex items-center gap-4 p-3 bg-white/50 dark:bg-black/20 rounded-lg">
+                        <div className="flex-1">
+                          <p className="font-medium">{member}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {stats.messageCount} messages ({Math.round(stats.messageCount / chat.analytics!.groupStats.totalMessages * 100)}%)
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Weekly Activity */}
+                <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                  <h3 className="text-xl font-bold mb-4">Weekly Activity</h3>
+                  <div className="w-full h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={Object.entries(chat.analytics.groupStats.timeline.daily)
+                          .map(([day, count]) => ({
+                            day: day.slice(0, 3), // Take first 3 letters of day name
+                            messages: count
+                          }))}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="day" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="messages" fill="#8884d8" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Daily Timeline */}
+                <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                  <h3 className="text-xl font-bold mb-4">Daily Timeline</h3>
+                  <div className="w-full h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={Object.entries(chat.analytics.groupStats.timeline.hourly)
+                          .map(([hour, count]) => ({
+                            hour: `${hour.padStart(2, '0')}:00`,
+                            messages: count
+                          }))}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="hour" />
+                        <YAxis />
+                        <Tooltip />
+                        <Bar dataKey="messages" fill="#82ca9d" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Top Words and Emojis */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                    <h3 className="text-xl font-bold mb-4">Top Words</h3>
+                    <div className="space-y-2">
+                      {chat.analytics.groupStats.topWords.map((word, index) => (
+                        <div key={index} className="flex justify-between items-center">
+                          <span className="font-medium">{word.word}</span>
+                          <span className="text-muted-foreground">{word.count}x</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                    <h3 className="text-xl font-bold mb-4">Top Emojis</h3>
+                    <div className="space-y-2">
+                      {chat.analytics.groupStats.topEmojis.map((emoji, index) => (
+                        <div key={index} className="flex justify-between items-center">
+                          <span className="text-2xl">{emoji.emoji}</span>
+                          <span className="text-muted-foreground">{emoji.count}x</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Time Spent & Laugh Counter */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                    <h3 className="text-xl font-bold mb-4">Time Spent Messaging</h3>
+                    {Object.entries(chat.analytics.memberStats).map(([member, stats]) => (
+                      <div key={member} className="flex justify-between items-center mb-2">
+                        <span className="font-medium">{member}</span>
+                        <span className="text-muted-foreground">
+                          {Math.round(stats.estimatedTimeSpent / 60 / 24 * 10) / 10} days
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
+                    <h3 className="text-xl font-bold mb-4">Laugh Counter</h3>
+                    <div className="flex items-center justify-center gap-4">
+                      <span className="text-4xl">😂</span>
+                      <div className="text-center">
+                        <p className="text-3xl font-bold">{chat.analytics.groupStats.laughCount}</p>
+                        <p className="text-sm text-muted-foreground">times</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : (

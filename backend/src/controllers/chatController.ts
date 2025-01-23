@@ -43,7 +43,8 @@ export const createChat = async (req: Request, res: Response): Promise<void> => 
             platform: req.body.platform,
             conversationType: req.body.conversationType,
             members: JSON.parse(req.body.members || '[]'),
-            chatContent: chatFile.buffer.toString('utf-8')
+            chatContent: chatFile.buffer.toString('utf-8'),
+            analytics: req.body.analytics ? JSON.parse(req.body.analytics) : undefined
         };
 
         const chatService = new ChatService();
