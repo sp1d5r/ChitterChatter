@@ -461,14 +461,19 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                     <div className="mb-6">
                       <p className="text-sm font-medium mb-2">Message Range Selection</p>
                       <div className="space-y-4">
-                        <Slider
-                          value={messageRange}
-                          min={0}
-                          max={parsedChat.messages.length}
-                          step={1}
-                          onValueChange={(value: [number, number]) => setMessageRange(value)}
-                          className="my-4"
-                        />
+                        <div className="relative pt-6">
+                          <Slider
+                            defaultValue={[messageRange[0], messageRange[1]]}
+                            min={0}
+                            max={parsedChat.messages.length}
+                            step={1}
+                            minStepsBetweenThumbs={100}
+                            onValueChange={(value: number[]) => setMessageRange([value[0], value[1]])}
+                            className="my-4"
+                            thumbs={2}
+                            value={[messageRange[0], messageRange[1]]}
+                          />
+                        </div>
                         <div className="flex justify-between text-sm text-muted-foreground">
                           <div>
                             <p>From: {parsedChat.messages[messageRange[0]] ? 
