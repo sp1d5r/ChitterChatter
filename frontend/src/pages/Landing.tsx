@@ -89,22 +89,22 @@ export const Landing: React.FC = () => {
 
         <div className="grid grid-cols-5 gap-4 max-w-6xl mx-auto">
           <div className="col-span-2 space-y-4">
-            <Card className="hover:border-blue-500 ease-in-out">
+            <Card className="hover:border-primary ease-in-out">
               <CardHeader>
-                <CardTitle>Feature Three</CardTitle>
+                <CardTitle>Chat Achievements</CardTitle>
                 <CardDescription>
-                  Describe another important aspect of your product and its capabilities.
+                  Unlock badges and achievements as you analyze more conversations.
                   <br/>
-                  <Button variant="link" className="p-0">Learn more →</Button>
+                  <Button variant="link" className="p-0">View badges →</Button>
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="hover:border-blue-500 ease-in-out">
+            <Card className="hover:border-primary ease-in-out">
               <CardHeader>
-                <CardTitle>Technology Highlight</CardTitle>
+                <CardTitle>Weekly Leaderboards</CardTitle>
                 <CardDescription>
-                  Showcase a key technology or framework that powers your product and its advantages.
+                  Compete with friends to see who's the ultimate chat champion this week.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -112,16 +112,20 @@ export const Landing: React.FC = () => {
 
           <Card className="col-span-3 hover:border-primary ease-in-out">
             <CardHeader>
-              <CardTitle>Feature Four</CardTitle>
+              <CardTitle>Chat Insights</CardTitle>
               <CardDescription>
-                Explain a complex feature or system within your product that sets it apart from competitors.
+                Get detailed breakdowns of your messaging style and habits.
                 <br/>
-                <Button variant="link" className="p-0">Discover more →</Button>
+                <Button variant="link" className="p-0">View example →</Button>
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="mt-4 border rounded p-4">
-                <div className="text-center text-gray-500">Feature Diagram Placeholder</div>
+                <div className="text-center space-y-2">
+                  <Badge variant="outline">🏆 Top Reactor</Badge>
+                  <Badge variant="outline">💬 Conversation Starter</Badge>
+                  <Badge variant="outline">🎯 Quick Responder</Badge>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -130,55 +134,57 @@ export const Landing: React.FC = () => {
         <div className="flex flex-col md:flex-row max-w-6xl mx-auto my-16 px-4">
           <div className="w-full md:w-1/2 mb-8 md:mb-0">
               <img 
-                  src="https://placehold.co/400" 
-                  alt="Description of the thing" 
-                  className="w-full aspect-sqaure h-auto object-cover rounded-lg shadow-lg"
+                  src="/achievements.svg" 
+                  alt="Chat achievements and badges" 
+                  className="w-full aspect-square h-auto object-cover rounded-lg shadow-lg"
               />
           </div>
           <div className="w-full md:w-1/2 md:pl-8 flex flex-col justify-center dark:text-white">
-              <p className="font-bold text-primary">FEATURE INFORMATION HERE</p>
-              <h2 className="text-3xl font-bold mb-4">Your Headline Here</h2>
+              <p className="font-bold text-primary">ACHIEVEMENTS</p>
+              <h2 className="text-3xl font-bold mb-4">Level Up Your Chats</h2>
               <p className="text-lg mb-6">
-              Your description text goes here. Explain the key features or benefits 
-              related to the image on the left. Make it compelling and informative.
+                Earn badges for your unique chat style. Are you the Emoji Master? 
+                The GIF Champion? Or maybe the Late Night Chatter? Find out and 
+                collect them all!
               <br/>
-              <Button>Call to Action</Button>
+              <Button>View Achievements</Button>
               </p>
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row max-w-6xl mx-auto my-16 px-4 dark:text-white">
           <div className="w-full md:w-1/2 md:pl-8 flex flex-col justify-center">
-              <p className="font-bold text-primary">FEATURE INFORMATION HERE</p>
-              <h2 className="text-3xl font-bold mb-4">Your Headline Here</h2>
+              <p className="font-bold text-primary">WEEKLY CHALLENGES</p>
+              <h2 className="text-3xl font-bold mb-4">New Challenges Every Week</h2>
               <p className="text-lg mb-6">
-              Your description text goes here. Explain the key features or benefits 
-              related to the image on the left. Make it compelling and informative.
+                Complete weekly challenges to earn special badges. Share your 
+                achievements with friends and see who can collect the most unique 
+                chat styles!
               <br/>
-              <Button>Call to Action</Button>
+              <Button>View Challenges</Button>
               </p>
           </div>
           <div className="w-full md:w-1/2 mb-8 md:mb-0">
               <img 
-                  src="https://placehold.co/400" 
-                  alt="Description of the thing" 
-                  className="w-full aspect-sqaure h-auto object-cover rounded-lg shadow-lg"
+                  src="/challenges.svg" 
+                  alt="Weekly chat challenges" 
+                  className="w-full aspect-square h-auto object-cover rounded-lg shadow-lg"
               />
           </div>
         </div>
 
         <div className="relative flex items-center justify-center my-50 min-h-[20vh]">
-          <div className="absolute w-[100vw] min-h-[20vh] bg-primary dark:bg-[#111111] flex flex-col justify-center items-center">
-              <h1 className="relative text-4xl font-bold m-0">
-                  <div className="absolute left-0 top-[1px] bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-2 from-purple-500 via-violet-500 to-pink-500 [text-shadow:0_0_rgba(0,0,0,0.1)]">
-                      <span className="">Join today</span>
+          <div className="absolute w-[100vw] min-h-[20vh] bg-secondary flex flex-col justify-center items-center">
+              <h1 className="relative text-4xl font-bold m-0 font-chivo">
+                  <div className="absolute left-0 top-[1px] bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-2 from-primary via-accent to-accent">
+                      <span className="">Start Your Chat Adventure</span>
                   </div>
-                  <div className="relative bg-clip-text text-transparent bg-no-repeat bg-gradient-to-r from-blue-500 via-violet-500 to-pink-500 py-2">
-                      <span className="">Join today</span>
+                  <div className="relative bg-clip-text text-transparent bg-no-repeat bg-gradient-to-r from-primary via-accent to-accent py-2">
+                      <span className="">Start Your Chat Adventure</span>
                   </div>
               </h1>
-              <p className="text-black mb-1 dark:text-white">Try today for free</p>
-              <Button variant="secondary">Sign up</Button>
+              <p className="text-white mb-1">Discover your unique chat personality today</p>
+              <Button onClick={() => window.location.href = '/dashboard'}>Get Started</Button>
           </div>
         </div>
       </div>
