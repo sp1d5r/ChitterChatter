@@ -39,8 +39,8 @@ export const Landing: React.FC = () => {
           Unlock the secrets of your chat personality
         </h1>
       
-        <div className="grid grid-cols-5 gap-4 mb-4 max-w-6xl mx-auto">
-          <Card className="col-span-3 hover:border-primary ease-in-out transition-all hover:shadow-lg">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 max-w-6xl mx-auto px-4">
+          <Card className="col-span-1 md:col-span-3 hover:border-primary ease-in-out transition-all hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="text-2xl">🎭</span>
@@ -78,7 +78,7 @@ export const Landing: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="col-span-2 hover:border-secondary ease-in-out transition-all hover:shadow-lg">
+          <Card className="col-span-1 md:col-span-2 hover:border-secondary ease-in-out transition-all hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="text-2xl">📊</span>
@@ -106,8 +106,8 @@ export const Landing: React.FC = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-5 gap-4 max-w-6xl mx-auto">
-          <div className="col-span-2 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 max-w-6xl mx-auto px-4">
+          <div className="col-span-1 md:col-span-2 space-y-4">
             <Card className="hover:border-primary ease-in-out transition-all hover:shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -135,7 +135,7 @@ export const Landing: React.FC = () => {
             </Card>
           </div>
 
-          <Card className="col-span-3 hover:border-primary ease-in-out transition-all hover:shadow-lg">
+          <Card className="col-span-1 md:col-span-3 hover:border-primary ease-in-out transition-all hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="text-2xl">💡</span>
@@ -165,7 +165,7 @@ export const Landing: React.FC = () => {
           </Card>
         </div>
 
-        <div className="flex flex-col md:flex-row max-w-6xl mx-auto my-16 px-4">
+        <div className="flex flex-col md:flex-row max-w-6xl mx-auto my-16 px-4 min-h-[400px]">
           <div className="w-full md:w-1/2 mb-8 md:mb-0 flex items-center justify-center">
               <motion.div 
                 className="relative w-72 h-72"
@@ -230,7 +230,7 @@ export const Landing: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row  h-72 max-w-6xl mx-auto my-16 px-4 dark:text-white">
+        <div className="flex flex-col md:flex-row h-auto min-h-[400px] max-w-6xl mx-auto my-16 px-4 dark:text-white">
           <div className="w-full md:w-1/2 md:pl-8 flex flex-col justify-center">
               <p className="font-bold text-primary">CHAT DETECTIVE</p>
               <h2 className="text-3xl font-bold mb-4">Who Sent That Message?</h2>
@@ -282,7 +282,7 @@ export const Landing: React.FC = () => {
         </div>
 
         <div className="relative flex items-center justify-center my-50 min-h-[20vh]">
-          <div className="absolute w-[100vw] min-h-[20vh] bg-secondary flex flex-col justify-center items-center">
+          <div className="absolute w-[100vw] min-h-[25vh] bg-secondary flex flex-col justify-center items-center p-5">
               <h1 className="relative text-4xl font-bold m-0 font-chivo">
                   <div className="absolute left-0 top-[1px] bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-2 from-primary via-accent to-accent">
                       <span className="">Start Your Chat Adventure</span>
