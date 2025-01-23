@@ -233,14 +233,14 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
             <>
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col gap-2">
-                    <p className="text-xl md:text-2xl font-bold text-black">Steps</p>
-                    <p className="text-sm text-muted-foreground">Follow the steps to create a new analysis.</p>
+                    <p className="text-xl md:text-2xl font-bold text-black dark:text-white">Steps</p>
+                    <p className="text-sm text-muted-foreground dark:text-white/70">Follow the steps to create a new analysis.</p>
                 </div>
               </div>
               <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
                 {steps.map((step, index) => (
                   <div key={index} className="flex flex-row gap-2 items-center text-black min-w-fit">
-                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-black flex items-center justify-center">
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-black flex items-center justify-center dark:text-white dark:border-white">
                       {index < currentStep ? (
                         <motion.div
                           initial={{ scale: 0 }}
@@ -250,11 +250,11 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                           <Check className="w-3 h-3 md:w-4 md:h-4" />
                         </motion.div>
                       ) : (
-                        <p className="hidden md:block text-sm md:text-base font-bold">{index + 1}</p>
+                        <p className="hidden md:block text-sm md:text-base font-bold text-black dark:text-white">{index + 1}</p>
                       )}
                     </div>
                     <div className="flex flex-col">
-                      <p className="hidden md:block text-sm md:text-base font-bold">{step.title}</p>
+                      <p className="hidden md:block text-sm md:text-base font-bold text-black dark:text-white">{step.title}</p>
                     </div>
                   </div>
                 ))}
@@ -303,10 +303,10 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
             exit={{ opacity: 0 }}
           >
             <DialogHeader>
-              <DialogTitle className="text-xl md:text-2xl font-bold">
+              <DialogTitle className="text-xl md:text-2xl font-bold text-black dark:text-white">
                 {steps[currentStep].title}
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-sm text-muted-foreground dark:text-white/70">
                 {steps[currentStep].subtitle}
               </DialogDescription>
             </DialogHeader>
@@ -366,7 +366,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                   >
                     <div className="flex flex-col items-start">
                       <span className="font-semibold">Significant Other</span>
-                      <span className="text-sm text-muted-foreground">Analyze conversations with your partner</span>
+                      <span className="text-sm text-muted-foreground dark:text-white/70">Analyze conversations with your partner</span>
                     </div>
                   </Button>
                   
@@ -377,7 +377,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                   >
                     <div className="flex flex-col items-start">
                       <span className="font-semibold">Friends</span>
-                      <span className="text-sm text-muted-foreground">Analyze group or individual chats with friends</span>
+                      <span className="text-sm text-muted-foreground dark:text-white/70">Analyze group or individual chats with friends</span>
                     </div>
                   </Button>
 
@@ -388,7 +388,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                   >
                     <div className="flex flex-col items-start">
                       <span className="font-semibold">Family</span>
-                      <span className="text-sm text-muted-foreground">Analyze group or individual chats with family members</span>
+                      <span className="text-sm text-muted-foreground dark:text-white/70">Analyze group or individual chats with family members</span>
                     </div>
                   </Button>
                 </div>
@@ -397,7 +397,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
               {currentStep === 2 && (
                 <div className="flex flex-col gap-4">
                   <div 
-                    className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+                    className={`border-2 border-dashed rounded-lg p-8 dark:text-white text-center cursor-pointer transition-colors ${
                       error ? 'border-red-500' : 'hover:border-primary'
                     }`}
                     onDragOver={(e) => e.preventDefault()}
@@ -417,7 +417,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                     }}
                   >
                     <Upload className={`mx-auto h-12 w-12 ${error ? 'text-red-500' : 'text-gray-400'}`} />
-                    <p className="mt-2">
+                    <p className="mt-2 text-black dark:text-white">
                       {chatData.chatFile ? 
                         chatData.chatFile.name : 
                         'Drag and drop your chat export here or click to browse'
@@ -433,9 +433,9 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                   )}
                   
                   {chatData.platform === 'whatsapp' && (
-                    <div className="text-sm text-muted-foreground mt-2">
-                      <p className="font-medium">How to export your WhatsApp chat:</p>
-                      <ol className="list-decimal list-inside mt-1 space-y-1">
+                    <div className="text-sm text-muted-foreground dark:text-white/70 mt-2">
+                      <p className="font-medium text-black dark:text-white ">How to export your WhatsApp chat:</p>
+                      <ol className="list-decimal list-inside mt-1 space-y-1 dark:text-white">
                         <li>Open the chat in WhatsApp</li>
                         <li>Tap the three dots menu (⋮)</li>
                         <li>Select 'More' → 'Export chat'</li>
@@ -451,15 +451,15 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-wrap gap-2 items-center mb-4">
                     <Users className="h-6 w-6" />
-                    <p className="text-lg font-medium">Select Members</p>
-                    <p className="text-sm text-muted-foreground w-full mt-2">
+                    <p className="text-lg font-medium text-black dark:text-white">Select Members</p>
+                    <p className="text-sm text-muted-foreground dark:text-white/70 w-full mt-2">
                       Select the members you want to analyze from the detected names in your chat. These are the exact names as they appear in your messages.
                     </p>
                   </div>
 
                   {parsedChat && parsedChat.messages.length > 0 && (
                     <div className="mb-6">
-                      <p className="text-sm font-medium mb-2">Message Range Selection</p>
+                      <p className="text-sm font-medium text-black dark:text-white mb-2">Message Range Selection</p>
                       <div className="space-y-4">
                         <div className="relative pt-6">
                           <Slider
@@ -470,25 +470,24 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                             minStepsBetweenThumbs={100}
                             onValueChange={(value: number[]) => setMessageRange([value[0], value[1]])}
                             className="my-4"
-                            thumbs={2}
                             value={[messageRange[0], messageRange[1]]}
                           />
                         </div>
-                        <div className="flex justify-between text-sm text-muted-foreground">
+                        <div className="flex justify-between text-sm text-muted-foreground dark:text-white/70">
                           <div>
                             <p>From: {parsedChat.messages[messageRange[0]] ? 
                               format(parsedChat.messages[messageRange[0]].timestamp, 'PPP') : 
                               'No messages'}</p>
-                            <p className="text-xs">Message {messageRange[0]} of {parsedChat.messages.length}</p>
+                            <p className="text-xs text-muted-foreground dark:text-white/50">Message {messageRange[0]} of {parsedChat.messages.length}</p>
                           </div>
                           <div className="text-right">
                             <p>To: {parsedChat.messages[messageRange[1] - 1] ? 
                               format(parsedChat.messages[messageRange[1] - 1].timestamp, 'PPP') : 
                               'No messages'}</p>
-                            <p className="text-xs">Message {messageRange[1]} of {parsedChat.messages.length}</p>
+                            <p className="text-xs text-muted-foreground dark:text-white/50">Message {messageRange[1]} of {parsedChat.messages.length}</p>
                           </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground dark:text-white/70">
                           Selected {messageRange[1] - messageRange[0]} messages for analysis
                         </p>
                       </div>
@@ -498,8 +497,8 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                   {detectedNames.length > 0 ? (
                     <div className="space-y-4">
                       <div className="flex flex-col gap-2">
-                        <p className="text-sm font-medium">Detected Names</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm font-medium text-black dark:text-white">Detected Names</p>
+                        <p className="text-sm text-muted-foreground dark:text-white/70">
                           Click on the names to select or deselect them for analysis. Names are shown exactly as they appear in your chat.
                         </p>
                       </div>
@@ -526,12 +525,12 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                           </Button>
                         ))}
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground mt-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-white/70 mt-4">
                         <p>Selected {chatData.members.length} of {detectedNames.length} members</p>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-muted-foreground dark:text-white/70">
                       No names detected in the chat. Please ensure your chat file contains messages.
                     </div>
                   )}
@@ -543,10 +542,10 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                   <div className="flex flex-wrap gap-2 items-center mb-4">
                     <div className="text-2xl">💭</div>
                     <p className="text-lg font-medium">Add Context</p>
-                    <p className="text-sm text-muted-foreground w-full mt-2">
+                    <p className="text-sm text-muted-foreground dark:text-white/70 w-full mt-2">
                       Help us understand your chat better by providing some context. This could include:
                     </p>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground ml-4 space-y-1">
+                    <ul className="list-disc list-inside text-sm text-muted-foreground dark:text-white/70 ml-4 space-y-1">
                       <li>How do you know these people?</li>
                       <li>What brings you together? (e.g., college friends, work team, family group)</li>
                       <li>Any significant events or inside jokes we should know about?</li>
@@ -561,7 +560,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                       value={chatContext}
                       onChange={(e) => setChatContext(e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground dark:text-white/70">
                       This context helps our AI better understand the dynamics and relationships in your chat.
                     </p>
                   </div>
