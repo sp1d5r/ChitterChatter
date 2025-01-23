@@ -172,7 +172,8 @@ export  interface ParsedWhatsAppChat {
     static generateFilteredChatFile(
       parsedChat: ParsedWhatsAppChat,
       selectedMembers: string[],
-      messageRange: [number, number]
+      messageRange: [number, number],
+      context: string
     ): File {
       const [startIdx, endIdx] = messageRange;
       const selectedMessages = parsedChat.messages
@@ -213,6 +214,8 @@ export  interface ParsedWhatsAppChat {
         `Total Messages Selected: ${selectedMessages.length}`,
         `Date Range: ${selectedMessages[0].timestamp.toLocaleDateString()} to ${selectedMessages[selectedMessages.length - 1].timestamp.toLocaleDateString()}`,
         `Selected Members: ${selectedMembers.join(', ')}`,
+        '\n=== Chat Context ===',
+        context,
         '===========================\n\n'
       ].join('\n');
   

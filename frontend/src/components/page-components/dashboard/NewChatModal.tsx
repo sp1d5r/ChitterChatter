@@ -48,6 +48,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
   const [error, setError] = useState<string | null>(null);
   const [parsedChat, setParsedChat] = useState<ParsedWhatsAppChat | null>(null);
   const [messageRange, setMessageRange] = useState<[number, number]>([0, 2000]);
+  const [chatContext, setChatContext] = useState<string>('');
   
   const steps: Steps[] = [
     {
@@ -69,6 +70,11 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
         title: "Select Members",
         subtitle: "Select members to analyze",
         completed: chatData.members.length > 0
+    },
+    {
+        title: "Add Context",
+        subtitle: "Help us understand your chat better",
+        completed: !!chatContext
     }
   ];
 
@@ -116,17 +122,19 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
   const handleSubmitAnimation = async () => {
     if (!parsedChat) return;
 
-    // Generate filtered chat file
+    // Generate filtered chat file with context
     const filteredChatFile = WhatsAppChatParser.generateFilteredChatFile(
       parsedChat,
       chatData.members,
-      messageRange
+      messageRange,
+      chatContext
     );
 
     const finalChatData = {
       ...chatData,
       chatFile: filteredChatFile,
-      messageRange
+      messageRange,
+      context: chatContext
     };
     
     setAnimationState({ isProcessing: true, currentAnimationStep: 0 });
@@ -159,6 +167,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
       chatFile: null,
       members: []
     });
+    setChatContext('');
     setAnimationState({
       isProcessing: false,
       currentAnimationStep: 0,
@@ -514,6 +523,36 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                       No names detected in the chat. Please ensure your chat file contains messages.
                     </div>
                   )}
+                </div>
+              )}
+
+              {currentStep === 4 && (
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-wrap gap-2 items-center mb-4">
+                    <div className="text-2xl">💭</div>
+                    <p className="text-lg font-medium">Add Context</p>
+                    <p className="text-sm text-muted-foreground w-full mt-2">
+                      Help us understand your chat better by providing some context. This could include:
+                    </p>
+                    <ul className="list-disc list-inside text-sm text-muted-foreground ml-4 space-y-1">
+                      <li>How do you know these people?</li>
+                      <li>What brings you together? (e.g., college friends, work team, family group)</li>
+                      <li>Any significant events or inside jokes we should know about?</li>
+                      <li>What kind of analysis are you most interested in?</li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-4">
+                    <textarea
+                      className="w-full h-32 p-3 rounded-md border-2 bg-background resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                      placeholder="Tell us about this chat and what you'd like to learn from it..."
+                      value={chatContext}
+                      onChange={(e) => setChatContext(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This context helps our AI better understand the dynamics and relationships in your chat.
+                    </p>
+                  </div>
                 </div>
               )}
             </motion.div>
