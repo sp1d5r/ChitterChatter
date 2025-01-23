@@ -108,14 +108,22 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
   return (
     <div className="min-h-screen pb-8">
       <div className="container mx-auto px-4">
-        {/* Header Section */}
-        <div className="py-8 space-y-6">
+        {/* Header Section - Updated styling */}
+        <div className="py-8 space-y-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
-            <div className="space-y-1">
-              <h1 className="font-chivo text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Your Conversations
-              </h1>
-              <p className="text-muted-foreground">
+            <div className="space-y-2">
+              <h2 className="text-3xl max-w-4xl relative z-20 md:text-4xl lg:text-5xl font-bold text-left font-sans tracking-tight dark:text-white">
+                Your
+                <div className="relative font-chivo inline-block w-max ml-2 [filter:drop-shadow(0px_1px_3px_rgba(27,_37,_80,_0.14))]">
+                  <div className="absolute left-0 top-[1px] bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-2 from-primary to-secondary">
+                    <span>Conversations</span>
+                  </div>
+                  <div className="relative bg-clip-text text-transparent bg-no-repeat bg-gradient-to-r from-primary to-secondary py-2">
+                    <span>Conversations</span>
+                  </div>
+                </div>
+              </h2>
+              <p className="text-lg text-muted-foreground dark:text-white">
                 Analyze and explore your chat insights
               </p>
             </div>
@@ -124,61 +132,71 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
             </div>
           </div>
 
-          {/* Quick Stats */}
+          {/* Quick Stats - Fixed styling */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-coffee-50 dark:bg-transparent border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
+            <Card className="ease-in-out transition-all hover:shadow-lg bg-primary/10">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-purple-600">
-                  Total Conversations
+                <CardTitle className="text-sm font-medium">
+                  <div className="flex items-center gap-2 text-2xl font-bold">
+                    <span className="">📊</span>
+                    Total Conversations
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{chats.length}</div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-secondary mt-1 dark:text-white">
                   Across all platforms
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-coffee-50 dark:bg-transparent border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
+            <Card className="ease-in-out transition-all hover:shadow-lg bg-primary/10">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-purple-600">
-                  Active Analyses
+                <CardTitle className="text-sm font-medium">
+                  <div className="flex items-center gap-2 text-2xl font-bold">
+                    <span className="text-2xl">⚡</span>
+                    Active Analyses
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {chats.filter(c => c.analysis?.status === 'processing').length}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground mt-1 dark:text-white">
                   Currently processing
                 </p>
               </CardContent>
             </Card>
-            <Card className="bg-coffee-50 dark:bg-transparent border-2 border-primary dark:border-primary-dark transform transition-all hover:-translate-y-1">
+            <Card className="ease-in-out transition-all hover:shadow-lg bg-primary/10">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-purple-600">
-                  Total Members
+                <CardTitle className="text-sm font-medium">
+                  <div className="flex items-center gap-2 text-2xl font-bold">
+                    <span className="text-2xl">👥</span>
+                    Total Members
+                  </div>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {new Set(chats.flatMap(c => c.members)).size}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground mt-1 dark:text-white">
                   Unique participants
                 </p>
               </CardContent>
             </Card>
           </div>
 
-          {/* Filters Section */}
-          <div className="flex flex-col md:flex-row gap-4">
+          {/* Filters Section - Fixed styling */}
+          <div className="flex flex-col md:flex-row gap-4 bg-background border-2 p-4 rounded-lg items-center">
+          <SlidersHorizontal className="h-4 w-4 dark:text-white" />
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground dark:text-white" />
                 <Input
                   placeholder="Search conversations..."
-                  className="pl-9 bg-coffee-50 dark:bg-transparent border-2 border-violet-200"
+                  className="pl-9 bg-background border-2 hover:border-primary transition-colors dark:text-white"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -186,7 +204,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
             </div>
             <div className="flex gap-2 dark:text-white">
               <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 bg-background border-2 hover:border-secondary transition-colors">
                   <SelectValue placeholder="Platform" />
                 </SelectTrigger>
                 <SelectContent>
@@ -199,7 +217,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 </SelectContent>
               </Select>
               <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 bg-background border-2 hover:border-secondary transition-colors">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -211,27 +229,24 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                   ))}
                 </SelectContent>
               </Select>
-              <Button variant="outline" size="icon">
-                <SlidersHorizontal className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </div>
 
-        {/* Conversations Grid */}
+        {/* Conversations Grid - Fixed styling */}
         {filteredChats.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredChats.map((chat) => (
-              <div key={chat.id} className="transform transition-all hover:scale-105">
+              <div key={chat.id} className="transform transition-all hover:scale-[1.02]">
                 <ChatCarousel chat={chat} onDelete={handleDeleteChat} />
               </div>
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center bg-coffee-50 dark:bg-coffee-900 rounded-2xl border-2 border-violet-200">
-            <Inbox className="h-12 w-12 text-muted-foreground mb-4" />
+          <div className="flex flex-col items-center justify-center py-12 text-center bg-background border-2 rounded-lg border-dashed border-muted-foreground/25 dark:text-white">
+            <Inbox className="h-12 w-12 text-muted-foreground mb-4 dark:text-white" />
             <h3 className="text-lg font-medium">No conversations found</h3>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className="text-sm text-muted-foreground mt-1 dark:text-white">
               Try adjusting your filters or start a new analysis
             </p>
           </div>
