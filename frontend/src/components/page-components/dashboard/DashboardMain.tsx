@@ -110,7 +110,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
       <div className="container mx-auto px-4">
         {/* Header Section */}
         <div className="py-8 space-y-6">
-          <div className="flex justify-between items-start">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div className="space-y-1">
               <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
                 Your Conversations
@@ -119,7 +119,9 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 Analyze and explore your chat insights
               </p>
             </div>
-            <NewChatModal onFinish={handleNewChat} />
+            <div className="flex justify-start sm:justify-end">
+              <NewChatModal onFinish={handleNewChat} />
+            </div>
           </div>
 
           {/* Quick Stats */}
