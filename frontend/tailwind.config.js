@@ -35,7 +35,7 @@ module.exports = {
         secondary: {
           DEFAULT: "#123C69", // The navy blue
           foreground: "#FFFFFF",
-          dark: "#123C69",
+          dark: "#FFFFFF",
           "dark-foreground": "#FFFFFF"
         },
         muted: {

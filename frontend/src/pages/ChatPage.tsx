@@ -374,12 +374,12 @@ export const ChatPage = () => {
                 <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
                   <h3 className="text-xl font-bold mb-4">Message Distribution</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(chat.analytics.memberStats).map(([member, stats]) => (
+                    {Object.entries(chat.analytics.memberStats).sort((a, b) => b[1].messageCount - a[1].messageCount).map(([member, stats]) => (
                       <div key={member} 
                            className="flex items-center gap-4 p-3 bg-white/50 dark:bg-black/20 rounded-lg">
                         <div className="flex-1">
                           <p className="font-medium">{member}</p>
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-muted-foreground dark:text-white">
                             {stats.messageCount} messages ({Math.round(stats.messageCount / chat.analytics!.groupStats.totalMessages * 100)}%)
                           </p>
                         </div>
@@ -443,7 +443,7 @@ export const ChatPage = () => {
                         <div key={index} 
                              className="flex justify-between items-center p-2 rounded-lg hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
                           <span className="font-medium text-lg mr-2">{word.word}</span>
-                          <span className="text-muted-foreground bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-full text-sm">
+                          <span className="text-muted-foreground dark:text-white bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-full text-sm">
                             {word.count}x
                           </span>
                         </div>
@@ -458,7 +458,7 @@ export const ChatPage = () => {
                         <div key={index} 
                              className="flex justify-between items-center p-2 rounded-lg hover:bg-white/50 dark:hover:bg-black/20 transition-colors">
                           <span className="text-2xl">{emoji.emoji}</span>
-                          <span className="text-muted-foreground bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-full text-sm">
+                          <span className="text-muted-foreground dark:text-white bg-purple-100 dark:bg-purple-900/30 px-3 py-1 rounded-full text-sm">
                             {emoji.count}x
                           </span>
                         </div>
@@ -471,10 +471,10 @@ export const ChatPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-coffee-50 dark:bg-transparent border-2 border-violet-200 p-4 sm:p-6 rounded-xl sm:rounded-2xl">
                     <h3 className="text-xl font-bold mb-4">Time Spent Messaging</h3>
-                    {Object.entries(chat.analytics.memberStats).map(([member, stats]) => (
+                    {Object.entries(chat.analytics.memberStats).sort((a, b) => b[1].estimatedTimeSpent - a[1].estimatedTimeSpent).map(([member, stats]) => (
                       <div key={member} className="flex justify-between items-center mb-2">
                         <span className="font-medium">{member}</span>
-                        <span className="text-muted-foreground">
+                        <span className="text-muted-foreground dark:text-white">
                           {Math.round(stats.estimatedTimeSpent)} minutes
                         </span>
                       </div>
