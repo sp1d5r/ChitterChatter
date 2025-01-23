@@ -27,7 +27,7 @@ export const Landing: React.FC = () => {
                 Upload your chat history and uncover hilarious insights about your texting style. 
                 Are you the Meme Lord? The Ghost? Or maybe the Therapist Friend? Let's find out! 
               </p>
-              <Button className="dark:text-white">
+              <Button className="dark:text-white relative z-20" onClick={() => window.location.href = '/dashboard'}>
                 Analyze your chats
               </Button>
             </div>
