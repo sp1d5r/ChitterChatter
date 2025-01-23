@@ -106,8 +106,25 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
   const types = ['Family', 'Friends', 'Work', 'Other'];
 
   return (
-    <div className="min-h-screen pb-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen pb-8 relative overflow-hidden">
+      <div className="absolute inset-0 -z-10 overflow-hidden opacity-70 rounded-xl">
+        <div className="absolute left-[-20%] top-[-10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[100px]" />
+        <div className="absolute right-[-20%] top-[20%] h-[500px] w-[500px] rounded-full bg-secondary/10 blur-[100px]" />
+        <div className="absolute left-[10%] bottom-[-10%] h-[500px] w-[500px] rounded-full bg-primary/10 blur-[100px]" />
+      </div>
+
+      <div 
+        className="absolute inset-0 -z-10" 
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px'
+        }}
+      />
+
+      <div className="container mx-auto px-4 relative">
         {/* Header Section - Updated styling */}
         <div className="py-8 space-y-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
@@ -134,7 +151,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
 
           {/* Quick Stats - Fixed styling */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="ease-in-out transition-all hover:shadow-lg bg-primary/10">
+            <Card className="hover:border-primary border-2 ease-in-out transition-all hover:shadow-lg bg-background/95 backdrop-blur-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
                   <div className="flex items-center gap-2 text-2xl font-bold">
@@ -150,7 +167,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 </p>
               </CardContent>
             </Card>
-            <Card className="ease-in-out transition-all hover:shadow-lg bg-primary/10">
+            <Card className="hover:border-secondary border-2 ease-in-out transition-all hover:shadow-lg bg-background/95 backdrop-blur-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
                   <div className="flex items-center gap-2 text-2xl font-bold">
@@ -168,7 +185,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
                 </p>
               </CardContent>
             </Card>
-            <Card className="ease-in-out transition-all hover:shadow-lg bg-primary/10">
+            <Card className="hover:border-accent border-2 ease-in-out transition-all hover:shadow-lg bg-background/95 backdrop-blur-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
                   <div className="flex items-center gap-2 text-2xl font-bold">
@@ -189,7 +206,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
           </div>
 
           {/* Filters Section - Fixed styling */}
-          <div className="flex flex-col md:flex-row gap-4 bg-background border-2 p-4 rounded-lg items-center">
+          <div className="flex flex-col md:flex-row gap-4 bg-background/95 backdrop-blur-sm border-2 p-4 rounded-lg my-8">
           <SlidersHorizontal className="h-4 w-4 dark:text-white" />
             <div className="flex-1">
               <div className="relative">
@@ -243,7 +260,7 @@ export const DashboardMain: React.FC<DashboardMainProps> = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-12 text-center bg-background border-2 rounded-lg border-dashed border-muted-foreground/25 dark:text-white">
+          <div className="flex flex-col items-center justify-center py-12 text-center bg-background/95 backdrop-blur-sm border-2 rounded-lg border-dashed border-muted-foreground/25 dark:text-white">
             <Inbox className="h-12 w-12 text-muted-foreground mb-4 dark:text-white" />
             <h3 className="text-lg font-medium">No conversations found</h3>
             <p className="text-sm text-muted-foreground mt-1 dark:text-white">
