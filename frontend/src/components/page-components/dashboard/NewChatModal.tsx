@@ -14,6 +14,7 @@ import { ChatData } from "shared";
 import { WhatsAppChatParser, ParsedWhatsAppChat, ChatAnalyticsService } from "../../../utils/chat-parsers/WhatsAppChatParser";
 import { Slider } from "../../shadcn/slider";
 import { format } from "date-fns";
+import JSZip from 'jszip';
 
 interface Steps {
     title: string;
@@ -90,25 +91,58 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
 
   const handleFileUpload = async (file: File) => {
     setError(null);
-    const text = await file.text();
     
-    if (chatData.platform === 'whatsapp' && !WhatsAppChatParser.validateFormat(text)) {
-      setError('Invalid WhatsApp chat format. Please ensure you\'ve exported the chat correctly from WhatsApp.');
-      return;
+    let textContent: string;
+    
+    try {
+      if (file.name.endsWith('.zip')) {
+        const zip = new JSZip();
+        const zipContents = await zip.loadAsync(file);
+        
+        // Find the first .txt file in the ZIP
+        const txtFile = Object.values(zipContents.files).find(f => 
+          f.name.endsWith('.txt') && !f.dir
+        );
+        
+        if (!txtFile) {
+          setError('No text file found in the ZIP archive.');
+          return;
+        }
+        
+        textContent = await txtFile.async('string');
+      } else if (file.name.endsWith('.txt')) {
+        textContent = await file.text();
+      } else {
+        setError('Please upload a .txt file or a ZIP archive containing a chat export.');
+        return;
+      }
+      
+      if (chatData.platform === 'whatsapp' && !WhatsAppChatParser.validateFormat(textContent)) {
+        setError('Invalid WhatsApp chat format. Please ensure you\'ve exported the chat correctly from WhatsApp.');
+        return;
+      }
+      
+      setFilePreview(textContent);
+      
+      if (chatData.platform === 'whatsapp') {
+        const parsed = WhatsAppChatParser.parse(textContent);
+        setParsedChat(parsed);
+        setDetectedNames(Array.from(parsed.uniqueSenders));
+        const totalMessages = parsed.messages.length;
+        setMessageRange([Math.max(0, totalMessages - 2000), totalMessages]);
+      }
+      
+      // Create a new File object with the extracted text content
+      const newFile = new File([textContent], file.name.endsWith('.zip') ? '_chat.txt' : file.name, {
+        type: 'text/plain'
+      });
+      
+      setChatData(prev => ({ ...prev, chatFile: newFile }));
+      handleNext();
+    } catch (error) {
+      console.error('Error processing file:', error);
+      setError('Error processing file. Please try again.');
     }
-    
-    setFilePreview(text);
-    
-    if (chatData.platform === 'whatsapp') {
-      const parsed = WhatsAppChatParser.parse(text);
-      setParsedChat(parsed);
-      setDetectedNames(Array.from(parsed.uniqueSenders));
-      const totalMessages = parsed.messages.length;
-      setMessageRange([Math.max(0, totalMessages - 2000), totalMessages]);
-    }
-    
-    setChatData(prev => ({ ...prev, chatFile: file }));
-    handleNext();
   };
 
   const handleNext = () => {
@@ -409,6 +443,7 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                     onClick={() => {
                       const input = document.createElement('input');
                       input.type = 'file';
+                      input.accept = '.txt,.zip';
                       input.onchange = (e) => {
                         const file = (e.target as HTMLInputElement).files?.[0];
                         if (file) handleFileUpload(file);
@@ -422,6 +457,9 @@ export const NewChatModal: React.FC<NewChatModalProps> = ({ onFinish }) => {
                         chatData.chatFile.name : 
                         'Drag and drop your chat export here or click to browse'
                       }
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground dark:text-white/70">
+                      Supports .txt files or .zip archives containing chat exports
                     </p>
                   </div>
                   
