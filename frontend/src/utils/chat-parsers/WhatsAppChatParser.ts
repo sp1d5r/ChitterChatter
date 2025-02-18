@@ -102,59 +102,81 @@ export  interface ParsedWhatsAppChat {
       // Split by message timestamp pattern instead of newlines
       const chunks = text.split(/(?=\[\d{2}\/\d{2}\/\d{4},\s\d{2}:\d{2}:\d{2}\])/);
   
-      
       for (const chunk of chunks) {
         const trimmedChunk = chunk.trim();
         if (!trimmedChunk) continue;
     
-        const match = trimmedChunk.match(this.messageRegex);
-        if (match) {
+        try {
+          const match = trimmedChunk.match(this.messageRegex);
+          if (!match) {
+            console.warn('Skipping unparseable message:', trimmedChunk);
+            continue;
+          }
+    
           const [_, date, time, sender, content] = match;
           
-          // Parse timestamp
-          const [day, month, year] = date.split('/');
-          const [hour, minute, second] = time.split(':');
-          const timestamp = new Date(
-            parseInt(year, 10),
-            parseInt(month, 10) - 1,
-            parseInt(day, 10),
-            parseInt(hour, 10),
-            parseInt(minute, 10),
-            parseInt(second, 10)
-          );
-  
-          // Track chat date range
-          if (!startDate || timestamp < startDate) startDate = timestamp;
-          if (!endDate || timestamp > endDate) endDate = timestamp;
-  
-          // Check message properties
-          const isEdited = content.includes('‎<This message was edited>');
-          const isDeleted = content.includes('This message was deleted');
-          const {type: messageType, mediaInfo} = this.determineMessageType(content);
-  
-          // Update counters
-          if (isEdited) editedMessages++;
-          if (isDeleted) deletedMessages++;
-          if (messageType === MessageType.MEDIA) mediaCount++;
-  
-          // Clean content
-          let cleanContent = content
-            .replace('‎<This message was edited>', '')
-            .trim();
-  
-  
-          messages.push({
-            timestamp,
-            sender: sender.trim(),
-            content: cleanContent,
-            isEdited,
-            isDeleted,
-            messageType,
-            ...(mediaInfo && {mediaInfo})
-          });
-  
-          uniqueSenders.add(sender.trim());
+          // Parse timestamp with error handling
+          try {
+            const [day, month, year] = date.split('/');
+            const [hour, minute, second] = time.split(':');
+            const timestamp = new Date(
+              parseInt(year, 10),
+              parseInt(month, 10) - 1,
+              parseInt(day, 10),
+              parseInt(hour, 10),
+              parseInt(minute, 10),
+              parseInt(second, 10)
+            );
+    
+            // Validate timestamp
+            if (isNaN(timestamp.getTime())) {
+              console.warn('Invalid timestamp for message:', trimmedChunk);
+              continue;
+            }
+    
+            // Track chat date range
+            if (!startDate || timestamp < startDate) startDate = timestamp;
+            if (!endDate || timestamp > endDate) endDate = timestamp;
+    
+            // Check message properties
+            const isEdited = content.includes('‎<This message was edited>');
+            const isDeleted = content.includes('This message was deleted');
+            const {type: messageType, mediaInfo} = this.determineMessageType(content);
+    
+            // Update counters
+            if (isEdited) editedMessages++;
+            if (isDeleted) deletedMessages++;
+            if (messageType === MessageType.MEDIA) mediaCount++;
+    
+            // Clean content
+            let cleanContent = content
+              .replace('‎<This message was edited>', '')
+              .trim();
+    
+            messages.push({
+              timestamp,
+              sender: sender.trim(),
+              content: cleanContent,
+              isEdited,
+              isDeleted,
+              messageType,
+              ...(mediaInfo && {mediaInfo})
+            });
+    
+            uniqueSenders.add(sender.trim());
+          } catch (error) {
+            console.warn('Error parsing message timestamp:', trimmedChunk, error);
+            continue;
+          }
+        } catch (error) {
+          console.warn('Error processing message chunk:', trimmedChunk, error);
+          continue;
         }
+      }
+  
+      // Ensure we have at least some valid messages
+      if (messages.length === 0) {
+        throw new Error('No valid messages could be parsed from the chat');
       }
   
       return {
